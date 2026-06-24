@@ -11,13 +11,19 @@ namespace Babel
         public Transform leftBuoyancyPoint;
         public Transform rightBuoyancyPoint;
 
-        [Header("부력 값")]
-        public float baseBuoyancy = 15f; // 기본적으로 떠받치는 힘
-        public float restoreFactor = 5f; // 기울어졌을 때 복원하는 힘의 계수
 
         [Header("해수면 설정")]
         public float waterLevel = 0.0f;
         public float waterResist = 2.0f;
+
+        private float baseBuoyancy; // 기본적으로 떠받치는 힘
+
+
+        private void Start()
+        {
+            if (rb == null) rb = GetComponent<Rigidbody2D>();
+            baseBuoyancy = rb.mass * 0.4f;
+        }
 
         private void FixedUpdate()
         {
