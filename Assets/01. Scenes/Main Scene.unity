@@ -159,6 +159,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 156850916}
+  - component: {fileID: 156850917}
   - component: {fileID: 156850915}
   - component: {fileID: 156850914}
   - component: {fileID: 156850913}
@@ -323,6 +324,23 @@ Transform:
   - {fileID: 1335924531}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &156850917
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156850912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b0b29b5914ed164c86e42f589c7bfc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ship
+  rb: {fileID: 156850914}
+  leftBuoyancyPoint: {fileID: 579972334}
+  rightBuoyancyPoint: {fileID: 1335924531}
+  baseBuoyancy: 10
+  restoreFactor: 2.5
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -808,6 +826,7 @@ Transform:
   - {fileID: 696448919}
   - {fileID: 1170954534}
   - {fileID: 1480891292}
+  - {fileID: 1158543512}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1093277832
@@ -887,11 +906,11 @@ Transform:
   m_GameObject: {fileID: 1158543511}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -12, z: 0}
+  m_LocalPosition: {x: 4.92802, y: -12.68179, z: 0}
   m_LocalScale: {x: 68.85, y: 23.7, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1047304524}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &1158543513
 BoxCollider2D:
@@ -1578,5 +1597,4 @@ SceneRoots:
   - {fileID: 1093277833}
   - {fileID: 156850916}
   - {fileID: 712988469}
-  - {fileID: 1158543512}
   - {fileID: 1623335118}
