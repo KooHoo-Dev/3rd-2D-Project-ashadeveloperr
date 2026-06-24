@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 
 namespace Babel
 {
-    public class StageManager : MonoBehaviour
+    public class PlayerController : MonoBehaviour
     {
         #region Settings
 

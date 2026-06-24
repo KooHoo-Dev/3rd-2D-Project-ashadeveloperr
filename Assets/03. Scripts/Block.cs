@@ -58,19 +58,19 @@ namespace Babel
             // 2. 두 개체가 사라짐
             // 3. 상위 개체가 사라진 두 개체의 중앙 위치에 생김
 
-            // 두 개체가 접촉해서 병합 요청이 두번 호출될 수 있으므로 한쪽에 bool 변수를 넣어서 중복호출되지 않게 만듦
-            if (IsMerged) return;
+            //// 두 개체가 접촉해서 병합 요청이 두번 호출될 수 있으므로 한쪽에 bool 변수를 넣어서 중복호출되지 않게 만듦
+            //if (IsMerged) return;
 
-            // 충돌 정보에서 나와 충돌한 gameObject에서 AnimalBall 컴포넌트를 읽어들임
-            Block contactBall = collision.gameObject.GetComponent<Block>();
+            //// 충돌 정보에서 나와 충돌한 gameObject에서 AnimalBall 컴포넌트를 읽어들임
+            //Block contactBall = collision.gameObject.GetComponent<Block>();
 
-            // 벽에 부딪혀서 충돌한 개체에 AnimalBall 컴포넌트가 없다면 이탈
-            if (contactBall == null) return;
+            //// 벽에 부딪혀서 충돌한 개체에 AnimalBall 컴포넌트가 없다면 이탈
+            //if (contactBall == null) return;
 
-            // 접촉한 볼과 나의 레벨이 다르다면
-            if (level != contactBall.level) return;
+            //// 접촉한 볼과 나의 레벨이 다르다면
+            //if (level != contactBall.level) return;
 
-            GameManager.Instance.MergeBall(this, contactBall);
+            //GameManager.Instance.MergeBall(this, contactBall);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
