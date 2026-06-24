@@ -7,16 +7,25 @@ namespace Babel
     {
         public Rigidbody2D rb;
 
+        [Header("갑판 피벗")]
+        public Transform deckLeft;
+        public Transform deckRight;
+        public Transform deckCenter;
+
         [Header("부력 피벗")]
         public Transform leftBuoyancyPoint;
         public Transform rightBuoyancyPoint;
-
 
         [Header("해수면 설정")]
         public float waterLevel = 0.0f;
         public float waterResist = 2.0f;
 
         private float baseBuoyancy; // 기본적으로 떠받치는 힘
+
+
+
+
+        #region Unity Methods
 
 
         private void Start()
@@ -29,7 +38,13 @@ namespace Babel
         {
             ApplyPointBuoyancy(leftBuoyancyPoint);
             ApplyPointBuoyancy(rightBuoyancyPoint);
+
         }
+
+        #endregion
+
+
+        #region Custom Methods
 
         private void ApplyPointBuoyancy(Transform buoyancyPoint)
         {
@@ -48,6 +63,11 @@ namespace Babel
             }
 
         }
+
+        
+
+        #endregion
+
 
     }
 

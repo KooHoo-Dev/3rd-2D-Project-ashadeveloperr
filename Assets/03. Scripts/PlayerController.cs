@@ -9,7 +9,7 @@ namespace Babel
         #region Settings
 
         [Header("Settings")]
-        public float speed = 1.0f;
+        public float speed = 8.0f;
         public float minXPos = -1.75f;
         public float maxXPos = 1.75f;
 
@@ -88,11 +88,11 @@ namespace Babel
         }
 
 
-        private IEnumerator SpawnDelayCoroutine(Block dropBall)
+        private IEnumerator SpawnDelayCoroutine(Block dropBlock)
         {
             while (true)
             {
-                if (dropBall.HasFirstContact) break;
+                if (dropBlock.HasFirstContact) break;
 
                 yield return null;
             }

@@ -11,29 +11,64 @@ namespace Babel
         public Block[] BallPrefabs;
         public int maxIndexInQueue = 4;
 
-        private Queue<int> ballIndexQueue = new Queue<int>();
+        public Ship ship;
+        public float drown;
+
+        private Queue<int> blockIndexQueue = new Queue<int>();
+
+
 
         #region Unity Methods;
+
         private void Awake()
         {
-            // 약식 싱글톤 선언
-            // 특정 한 객체만 남기고 역할이 겹치는 놈들을 모두 제거함
-            // 이처럼 하나의 인스턴스만 남기는 것을 싱글톤이라고 함
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
 
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BallPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
-            ballIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
+            blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
 
         }
+
+        public TextMeshProUGUI text;
+        private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
+        private int score;
+
+        private void Start()
+        {
+            
+        }
+
+        private void FixedUpdate()
+        {
+            IsDeckDrowing();
+            
+        }
+
         #endregion
 
-        // 큐에서 꺼내온 녀석을 반환
+
+
+        #region Custom Methods;
+
+
+        private void IsDeckDrowing()
+        {
+            if (ship.deckLeft.position.y <= 0 || ship.deckRight.position.y <= 0 || ship.deckCenter.position.y <= 0)
+            {
+                drown += Mathf.Abs(ship.deckLeft.position.y) * Time.deltaTime;
+                Debug.LogWarning($"도움! 현재 침수 상황 {drown}%");
+            }
+        }
+
+
+
+
         public Block GetNextBlock()
         {
-            int dequeueIndex = ballIndexQueue.Dequeue();
-            ballIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
+            int dequeueIndex = blockIndexQueue.Dequeue();
+            blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
 
             Block block = GetBlock(dequeueIndex);
             return block;
@@ -91,27 +126,14 @@ namespace Babel
             }
         }
 
-        public TextMeshProUGUI text;
-        private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
-        private int score;
-
-        private void Start()
-        {
-            scoreTable.Add(1, 10);
-            scoreTable.Add(2, 20);
-            scoreTable.Add(3, 30);
-            scoreTable.Add(4, 50);
-            scoreTable.Add(5, 70);
-            scoreTable.Add(6, 100);
-            scoreTable.Add(7, 130);
-            scoreTable.Add(8, 160);
-            scoreTable.Add(9, 200);
-        }
 
         private void AddScore(int upgradeLevel)
         {
             score += scoreTable[upgradeLevel];
             text.SetText($"{score}");
         }
+
+        #endregion
+
     }
 }
