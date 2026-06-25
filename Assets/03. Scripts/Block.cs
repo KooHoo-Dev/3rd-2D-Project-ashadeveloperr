@@ -12,29 +12,45 @@ namespace Babel
         public bool HasFirstContact { get; private set; } = false;
         public bool IsMerged { get; set; } = false;
 
-        private Rigidbody2D rBody;
+        private bool isUnderWater;
+
+        private Rigidbody2D rb;
         private Collider2D col;
 
         private void Awake()
         {
-            rBody = GetComponent<Rigidbody2D>();
+            rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
             col.enabled = false;
             //  gravityScale은 중력의 영향을 얼마나 받는지 결정하는 변수입니다
-            rBody.gravityScale = 0.0f;
-            rBody.bodyType = RigidbodyType2D.Kinematic;
+            rb.gravityScale = 0.0f;
+            rb.bodyType = RigidbodyType2D.Kinematic;
         }
 
         public void Drop()
         {
             col.enabled = true;
-            rBody.bodyType = RigidbodyType2D.Dynamic;
-            rBody.gravityScale = 1.0f;
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 1.0f;
 
             // transform.SetParent()
             // : 부모자식 관계를 형성해주는 함수 입니다. null 입력시
             //  부모 transform이 없는 월드 최상위 개체가 됩니다
             transform.SetParent(null);
+        }
+
+        private void Update()
+        {
+            IsUnderWater();
+        }
+
+        private void IsUnderWater()
+        {
+            if(transform.position.y <= 0 && isUnderWater == false)
+            {
+                isUnderWater = true;
+                rb.gravityScale /= 4;
+            }
         }
 
         // OnCollision 시리즈
@@ -73,12 +89,12 @@ namespace Babel
             //GameManager.Instance.MergeBall(this, contactBall);
         }
 
-        private void OnTriggerEnter2D(Collider2D collision)
-        {
-            if (HasFirstContact && collision.CompareTag("Finish"))
-            {
-            }
-        }
+        //private void OnTriggerEnter2D(Collider2D collision)
+        //{
+        //    if (HasFirstContact && collision.CompareTag("Finish"))
+        //    {
+        //    }
+        //}
 
 
     }
