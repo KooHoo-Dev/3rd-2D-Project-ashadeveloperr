@@ -51,11 +51,6 @@ namespace Babel
 
         private void UpdateMovement()
         {
-            // Mouse, Touch 등의 입력의 특징
-            // - 2차원 좌표계를 입력받을 수 있음
-            // - 이전 프레임과 현재 프레임의 변동량을 받을 수 있음 > delta
-            // - 키 입력의 시작, 유지, 종료 등을 인지할 수 있음
-
             // 한 프레임 당 마우스 입력 변화량을 가지고 옴
             Vector2 mouseDelta = Mouse.current.delta.value;
             // 게임 내의 좌표계로 바꿔주면서 적용함

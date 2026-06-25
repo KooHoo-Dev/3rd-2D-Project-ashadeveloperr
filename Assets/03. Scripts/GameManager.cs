@@ -55,7 +55,7 @@ namespace Babel
         private void FixedUpdate()
         {
             IsDeckSinking();
-            if (sinkPoint > 100 && isGameOver == false)
+            if (sinkPoint >= 100 && isGameOver == false)
             {
                 GameOver();
             }
