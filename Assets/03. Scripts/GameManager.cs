@@ -7,6 +7,7 @@ namespace Babel
 {
     public class GameManager : MonoBehaviour
     {
+        #region Refs and Var;
         public static GameManager Instance;
 
         public Block[] BallPrefabs;
@@ -22,8 +23,16 @@ namespace Babel
         private Queue<int> blockIndexQueue = new Queue<int>();
 
         public TextMeshPro text;
+        public GameObject ggScreen;
+        
         private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
         private int score;
+        #endregion
+
+        #region User Var;
+        private float pumpPower = 1.5f;
+
+        #endregion
 
         #region Unity Methods;
 
@@ -98,7 +107,7 @@ namespace Babel
             {
                 if (sinkPoint > 0)
                 {
-                    sinkPoint -= Time.deltaTime;
+                    sinkPoint -= pumpPower * Time.deltaTime;
                     Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
                 }
                 else sinkPoint = 0;
@@ -106,8 +115,12 @@ namespace Babel
             }
             else
             {
-                sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f;
-                Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+                if (sinkPoint < 100)
+                {
+                    sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f;
+                    Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+                }
+                else sinkPoint = 100;
             }
             
         }
@@ -179,6 +192,8 @@ namespace Babel
         private void GameOverEffect()
         {
             Vector3 moveVector = new Vector3(0, 1, 0);
+            SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
+            Color screenColor = screenSR.color;
             if (text.transform.position.y < 10.0f)
             {
                 moveVector = moveVector * 2.2f * Time.deltaTime;
@@ -187,6 +202,11 @@ namespace Babel
             if (ship.rb.gravityScale < 5.0f)
             {
                 ship.rb.gravityScale += 0.2f * Time.deltaTime;
+            }
+            if (screenColor.a < 0.8f)
+            {
+                screenColor.a += 0.1f * Time.deltaTime;
+                screenSR.color = screenColor;
             }
             Debug.Log($"GG");
         }
