@@ -12,7 +12,10 @@ namespace Babel
         public int maxIndexInQueue = 4;
 
         public Ship ship;
-        public float drown;
+        public float sinkPoint;
+
+        private bool isSinking;
+        private bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
@@ -42,8 +45,8 @@ namespace Babel
 
         private void FixedUpdate()
         {
-            IsDeckDrowing();
-            
+            if (isGameOver) GameOver();
+            IsDeckSinking();
         }
 
         #endregion
@@ -53,15 +56,50 @@ namespace Babel
         #region Custom Methods;
 
 
-        private void IsDeckDrowing()
+        private void IsDeckSinking()
         {
-            if (ship.deckLeft.position.y <= 0 || ship.deckRight.position.y <= 0 || ship.deckCenter.position.y <= 0)
+            if (ship.deckLeft.position.y <= 0 || ship.deckCenter.position.y <= 0 || ship.deckRight.position.y <= 0)
             {
-                drown += Mathf.Abs(ship.deckLeft.position.y) * Time.deltaTime;
-                Debug.LogWarning($"도움! 현재 침수 상황 {drown}%");
+                if (ship.deckLeft.position.y <= 0)
+                {
+                    SinkingEffect(ship.deckLeft);
+                }
+                if (ship.deckCenter.position.y <= 0)
+                {
+                    SinkingEffect(ship.deckCenter);
+                }
+                if (ship.deckRight.position.y <= 0)
+                {
+                    SinkingEffect(ship.deckRight);
+                }
+                isSinking = true;
+            }
+            else
+            {
+                isSinking = false;
+                SinkingEffect(null);
             }
         }
 
+        private void SinkingEffect(Transform deck)
+        {
+            if (deck == null)
+            {
+                if (sinkPoint > 0)
+                {
+                    sinkPoint -= Time.deltaTime;
+                    Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
+                }
+                else sinkPoint = 0;
+                
+            }
+            else
+            {
+                sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f;
+                Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+            }
+            
+        }
 
 
 

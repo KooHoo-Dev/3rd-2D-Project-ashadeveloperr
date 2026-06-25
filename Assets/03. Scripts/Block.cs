@@ -77,7 +77,6 @@ namespace Babel
         {
             if (HasFirstContact && collision.CompareTag("Finish"))
             {
-                GameManager.Instance.GameOver();
             }
         }
 
