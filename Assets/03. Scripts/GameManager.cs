@@ -208,11 +208,11 @@ namespace Babel
             }
             if (ship.rb.gravityScale < 5.0f)
             {
-                ship.rb.gravityScale += 0.2f * Time.deltaTime;
+                ship.rb.gravityScale += 0.3f * Time.deltaTime;
             }
             if (screenColor.a < 0.8f)
             {
-                screenColor.a += 0.1f * Time.deltaTime;
+                screenColor.a += 0.15f * Time.deltaTime;
                 screenSR.color = screenColor;
             }
             Debug.Log($"GG");

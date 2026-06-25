@@ -21,7 +21,7 @@ namespace Babel
         public float waterResist = 2.0f;
 
         private float baseBuoyancy; // 기본적으로 떠받치는 힘
-
+        
 
 
 
@@ -30,8 +30,11 @@ namespace Babel
 
         private void Start()
         {
+            rb.mass = transform.localScale.x * transform.localScale.y * 10.0f;
+            rb.gravityScale = rb.mass / 10000;
+            Debug.Log($"현재 배 무게 {rb.mass}");
             if (rb == null) rb = GetComponent<Rigidbody2D>();
-            baseBuoyancy = rb.mass * 0.4f;
+            baseBuoyancy = rb.mass * 0.3f;
         }
 
         private void FixedUpdate()
