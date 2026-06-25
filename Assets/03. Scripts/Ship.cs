@@ -31,7 +31,7 @@ namespace Babel
         private void Start()
         {
             rb.mass = transform.localScale.x * transform.localScale.y * 10.0f;
-            rb.gravityScale = rb.mass / 10000;
+            rb.gravityScale = rb.mass / 5000;
             Debug.Log($"현재 배 무게 {rb.mass}");
             if (rb == null) rb = GetComponent<Rigidbody2D>();
             baseBuoyancy = rb.mass * 0.3f;

@@ -9,6 +9,8 @@ namespace Babel
     public class GameManager : MonoBehaviour
     {
         #region Refs and Var;
+        private Camera Cam { get; set; }
+
         public static GameManager Instance;
 
         public Block[] BallPrefabs;
@@ -50,7 +52,7 @@ namespace Babel
 
         private void Start()
         {
-            
+            Cam = Camera.main;
         }
 
         private void FixedUpdate()
@@ -64,6 +66,10 @@ namespace Babel
             {
                 GameOverEffect();
             }
+            else
+            {
+                CameraWork();
+            }
         }
 
         #endregion
@@ -71,6 +77,23 @@ namespace Babel
 
 
         #region Custom Methods;
+
+
+        private void CameraWork()
+        {
+            Vector3 offset = new Vector3(0, 7, 0);
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, ship.transform.position + offset, 1.3f * Time.deltaTime);
+            lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
+            Cam.transform.position = lerpPos;
+        }
+
+        private void CameraReset()
+        {
+            Vector3 offset = new Vector3(0, 7, 0);
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 1.3f * Time.deltaTime);
+            lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
+            Cam.transform.position = lerpPos;
+        }
 
 
         private void IsDeckSinking()
@@ -182,6 +205,7 @@ namespace Babel
 
         public void GameOver()
         {
+            CameraReset();
             for (int i = 0; i < enableObjects.Length; ++i)
             {
                 enableObjects[i].SetActive(true);
@@ -197,10 +221,10 @@ namespace Babel
             Vector3 moveVector = new Vector3(0, 1, 0);
             SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
             Color screenColor = screenSR.color;
-            if (text.transform.position.y < 10.0f)
+            if (text.transform.position.y < 3.0f)
             {
-                Vector3 targetPos = new Vector3(0f, 10f, 0f);
-                Vector3 lerpPos = Vector3.Lerp(text.transform.position, targetPos, 1.0f * Time.deltaTime);
+                Vector3 targetPos = new Vector3(0f, 3f, 0f);
+                Vector3 lerpPos = Vector3.Lerp(text.transform.position, targetPos, 1.4f * Time.deltaTime);
                 text.transform.position = lerpPos;
 
                 //moveVector = moveVector * 2.2f * Time.deltaTime;
