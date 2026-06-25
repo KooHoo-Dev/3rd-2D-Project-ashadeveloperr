@@ -1,7 +1,8 @@
-using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UIElements;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
 {
@@ -55,10 +56,6 @@ namespace Babel
         private void FixedUpdate()
         {
             IsDeckSinking();
-            if (sinkPoint >= 100 && isGameOver == false)
-            {
-                GameOver();
-            }
         }
 
         private void Update()
@@ -103,26 +100,32 @@ namespace Babel
 
         private void SinkingEffect(Transform deck)
         {
-            if (deck == null)
+            if (isGameOver == false)
             {
-                if (sinkPoint > 0)
+                if (deck == null)
                 {
-                    sinkPoint -= pumpPower * Time.deltaTime;
-                    Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
+                    if (sinkPoint > 0)
+                    {
+                        sinkPoint -= pumpPower * Time.deltaTime;
+                        Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
+                    }
+                    else sinkPoint = 0;
+
                 }
-                else sinkPoint = 0;
-                
-            }
-            else
-            {
-                if (sinkPoint < 100)
+                else
                 {
-                    sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f;
-                    Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+                    if (sinkPoint < 100)
+                    {
+                        sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f - (pumpPower / 100);
+                        Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+                    }
+                    else
+                    {
+                        isGameOver = true;
+                        GameOver();
+                    }
                 }
-                else sinkPoint = 100;
             }
-            
         }
 
 
@@ -172,6 +175,7 @@ namespace Babel
         //}
 
         // 게임 오버가 되면 활성화될 개체들과 비활성화될 개체들
+
         [Header("GameOver Settings")]
         public GameObject[] enableObjects;
         public GameObject[] disableObjects;
@@ -186,7 +190,6 @@ namespace Babel
             {
                 disableObjects[i].SetActive(false);
             }
-            isGameOver = true;
         }
 
         private void GameOverEffect()
@@ -196,8 +199,12 @@ namespace Babel
             Color screenColor = screenSR.color;
             if (text.transform.position.y < 10.0f)
             {
-                moveVector = moveVector * 2.2f * Time.deltaTime;
-                text.transform.position += moveVector;
+                Vector3 targetPos = new Vector3(0f, 10f, 0f);
+                Vector3 lerpPos = Vector3.Lerp(text.transform.position, targetPos, 1.0f * Time.deltaTime);
+                text.transform.position = lerpPos;
+
+                //moveVector = moveVector * 2.2f * Time.deltaTime;
+                //text.transform.position += moveVector;
             }
             if (ship.rb.gravityScale < 5.0f)
             {
