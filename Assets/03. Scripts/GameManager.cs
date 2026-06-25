@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.UIElements;
 
 namespace Babel
 {
@@ -12,14 +13,17 @@ namespace Babel
         public int maxIndexInQueue = 4;
 
         public Ship ship;
-        public float sinkPoint;
+
+        private float sinkPoint;
 
         private bool isSinking;
         private bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
-
+        public TextMeshPro text;
+        private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
+        private int score;
 
         #region Unity Methods;
 
@@ -34,10 +38,6 @@ namespace Babel
 
         }
 
-        public TextMeshProUGUI text;
-        private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
-        private int score;
-
         private void Start()
         {
             
@@ -45,8 +45,19 @@ namespace Babel
 
         private void FixedUpdate()
         {
-            if (isGameOver) GameOver();
             IsDeckSinking();
+            if (sinkPoint > 100 && isGameOver == false)
+            {
+                GameOver();
+            }
+        }
+
+        private void Update()
+        {
+            if (isGameOver)
+            {
+                GameOverEffect();
+            }
         }
 
         #endregion
@@ -162,6 +173,22 @@ namespace Babel
             {
                 disableObjects[i].SetActive(false);
             }
+            isGameOver = true;
+        }
+
+        private void GameOverEffect()
+        {
+            Vector3 moveVector = new Vector3(0, 1, 0);
+            if (text.transform.position.y < 10.0f)
+            {
+                moveVector = moveVector * 2.2f * Time.deltaTime;
+                text.transform.position += moveVector;
+            }
+            if (ship.rb.gravityScale < 5.0f)
+            {
+                ship.rb.gravityScale += 0.2f * Time.deltaTime;
+            }
+            Debug.Log($"GG");
         }
 
 
