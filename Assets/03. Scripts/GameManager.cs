@@ -15,6 +15,8 @@ namespace Babel
 
         #region Refs and Var;
         private Camera Cam { get; set; }
+        
+        public StageUIManager UIManager;
 
         public Block[] BallPrefabs;
         public int maxIndexInQueue = 4;
@@ -27,9 +29,6 @@ namespace Babel
         private bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
-
-        public Transform resultUI;
-        public TextMeshProUGUI scoreText;
 
 
         public GameObject ggScreen;
@@ -47,11 +46,9 @@ namespace Babel
 
         protected override void Awake()
         {
-
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BallPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
-
         }
 
         private void Start()
@@ -210,6 +207,7 @@ namespace Babel
 
         public void GameOver()
         {
+            UIManager.ShowResultWindow();
             for (int i = 0; i < enableObjects.Length; ++i)
             {
                 enableObjects[i].SetActive(true);
@@ -225,16 +223,7 @@ namespace Babel
             Vector3 moveVector = new Vector3(0, 1, 0);
             SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
             Color screenColor = screenSR.color;
-            if (resultUI.transform.position.y < Cam.transform.position.y)
-            {
-                Vector3 targetPos = Cam.transform.position;
-                Vector3 lerpPos = Vector3.Lerp(resultUI.transform.position, targetPos, 1.5f * Time.deltaTime);
-                lerpPos.z = 1.0f;
-                resultUI.transform.position = lerpPos;
-
-                //moveVector = moveVector * 2.2f * Time.deltaTime;
-                //text.transform.position += moveVector;
-            }
+            
             if (ship.rb.gravityScale < 5.0f)
             {
                 ship.rb.gravityScale += 0.3f * Time.deltaTime;
@@ -251,7 +240,7 @@ namespace Babel
         private void AddScore(int upgradeLevel)
         {
             score += scoreTable[upgradeLevel];
-            scoreText.SetText($"{score}");
+            //scoreText.SetText($"{score}");
         }
 
         #endregion
