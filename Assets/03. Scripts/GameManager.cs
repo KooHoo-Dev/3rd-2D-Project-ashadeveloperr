@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.InputSystem;
 using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
@@ -233,6 +234,8 @@ namespace Babel
                 screenColor.a += 0.15f * Time.deltaTime;
                 screenSR.color = screenColor;
             }
+            UnityEngine.Cursor.visible = true;
+            UnityEngine.Cursor.lockState = CursorLockMode.Confined;
             Debug.Log($"GG");
         }
 
