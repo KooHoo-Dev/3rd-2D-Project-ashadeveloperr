@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Jay
+namespace Babel
 {
     public abstract class SingletonBase<T> : MonoBehaviour where T : MonoBehaviour
     {

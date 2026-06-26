@@ -6,12 +6,15 @@ using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
 {
-    public class GameManager : MonoBehaviour
+    public class GameManager : SingletonBase<GameManager>
     {
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+        }
+
         #region Refs and Var;
         private Camera Cam { get; set; }
-
-        public static GameManager Instance;
 
         public Block[] BallPrefabs;
         public int maxIndexInQueue = 4;
@@ -25,7 +28,10 @@ namespace Babel
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
-        public TextMeshPro text;
+        public Transform resultUI;
+        public TextMeshProUGUI scoreText;
+
+
         public GameObject ggScreen;
         
         private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
@@ -39,10 +45,8 @@ namespace Babel
 
         #region Unity Methods;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (Instance == null) Instance = this;
-            else Destroy(gameObject);
 
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BallPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
@@ -65,6 +69,7 @@ namespace Babel
             if (isGameOver)
             {
                 GameOverEffect();
+                CameraReset();
             }
             else
             {
@@ -82,15 +87,15 @@ namespace Babel
         private void CameraWork()
         {
             Vector3 offset = new Vector3(0, 7, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, ship.transform.position + offset, 1.3f * Time.deltaTime);
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, ship.transform.position + offset, 0.7f * Time.deltaTime);
             lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
             Cam.transform.position = lerpPos;
         }
 
         private void CameraReset()
         {
-            Vector3 offset = new Vector3(0, 7, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 1.3f * Time.deltaTime);
+            Vector3 offset = new Vector3(0, 18, 0);
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 0.4f * Time.deltaTime);
             lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
             Cam.transform.position = lerpPos;
         }
@@ -205,7 +210,6 @@ namespace Babel
 
         public void GameOver()
         {
-            CameraReset();
             for (int i = 0; i < enableObjects.Length; ++i)
             {
                 enableObjects[i].SetActive(true);
@@ -221,11 +225,12 @@ namespace Babel
             Vector3 moveVector = new Vector3(0, 1, 0);
             SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
             Color screenColor = screenSR.color;
-            if (text.transform.position.y < 3.0f)
+            if (resultUI.transform.position.y < Cam.transform.position.y)
             {
-                Vector3 targetPos = new Vector3(0f, 3f, 0f);
-                Vector3 lerpPos = Vector3.Lerp(text.transform.position, targetPos, 1.4f * Time.deltaTime);
-                text.transform.position = lerpPos;
+                Vector3 targetPos = Cam.transform.position;
+                Vector3 lerpPos = Vector3.Lerp(resultUI.transform.position, targetPos, 1.5f * Time.deltaTime);
+                lerpPos.z = 1.0f;
+                resultUI.transform.position = lerpPos;
 
                 //moveVector = moveVector * 2.2f * Time.deltaTime;
                 //text.transform.position += moveVector;
@@ -246,7 +251,7 @@ namespace Babel
         private void AddScore(int upgradeLevel)
         {
             score += scoreTable[upgradeLevel];
-            text.SetText($"{score}");
+            scoreText.SetText($"{score}");
         }
 
         #endregion

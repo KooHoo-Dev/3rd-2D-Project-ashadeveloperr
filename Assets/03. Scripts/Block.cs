@@ -49,7 +49,16 @@ namespace Babel
             if(transform.position.y <= 0 && isUnderWater == false)
             {
                 isUnderWater = true;
-                rb.gravityScale /= 4;
+                rb.gravityScale /= 5;
+                rb.mass /= 5;
+                rb.linearVelocity /= 15;
+            }
+            else if(transform.position.y > 0 && isUnderWater)
+            {
+                isUnderWater = false;
+                rb.gravityScale *= 5;
+                rb.mass *= 5;
+                rb.linearVelocity *= 15;
             }
         }
 
