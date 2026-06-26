@@ -50,15 +50,12 @@ namespace Babel
             {
                 isUnderWater = true;
                 rb.gravityScale /= 5;
-                rb.mass /= 5;
-                rb.linearVelocity /= 15;
+                rb.linearVelocity /= 500;
             }
             else if(transform.position.y > -0.5f && isUnderWater)
             {
                 isUnderWater = false;
                 rb.gravityScale *= 5;
-                rb.mass *= 5;
-                rb.linearVelocity *= 15;
             }
         }
 

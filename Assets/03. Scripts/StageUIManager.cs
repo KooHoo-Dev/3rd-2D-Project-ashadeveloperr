@@ -10,7 +10,7 @@ namespace Babel
         private RectTransform rectTransform;
         private Canvas parentCanvas;
 
-        private float lerpSpeed = 1.5f;
+        private float lerpSpeed = 2.0f;
         private Vector2 targetPosition;
         private bool isMoving = false;
 
@@ -22,23 +22,13 @@ namespace Babel
 
         private void Start()
         {
-            InitPosition();
+            
         }
         private void Update()
         {
             MoveResultWindow();
         }
 
-
-        private void InitPosition()
-        {
-            RectTransform canvasRect = parentCanvas.GetComponent<RectTransform>();
-            float screenHeight = canvasRect.rect.height;
-
-            rectTransform.anchoredPosition = new Vector2(0, -screenHeight);
-
-            targetPosition = rectTransform.anchoredPosition;
-        }
 
         public void ShowResultWindow()
         {
@@ -48,14 +38,21 @@ namespace Babel
         
         private void MoveResultWindow()
         {
-            if (!isMoving) return;
-
-            rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, targetPosition, Time.deltaTime * lerpSpeed);
-
-            if (Vector2.Distance(rectTransform.anchoredPosition, targetPosition) < 0.1f)
+            if (isMoving)
             {
-                rectTransform.anchoredPosition = targetPosition;
-                isMoving = false;
+                if (Vector2.Distance(rectTransform.anchoredPosition, targetPosition) >= 0.1f)
+                {
+                    rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, targetPosition, Time.deltaTime * lerpSpeed);
+                }
+            }
+            else
+            {
+                RectTransform canvasRect = parentCanvas.GetComponent<RectTransform>();
+                float screenHeight = canvasRect.rect.height;
+
+                rectTransform.anchoredPosition = new Vector2(0, -screenHeight);
+
+                targetPosition = rectTransform.anchoredPosition;
             }
         }
     }
