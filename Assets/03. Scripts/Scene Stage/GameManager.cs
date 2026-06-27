@@ -15,7 +15,6 @@ namespace Babel
         }
 
         #region Refs and Var;
-        private Camera Cam { get; set; }
         
         public StageUIManager UIManager;
 
@@ -27,7 +26,7 @@ namespace Babel
         private float sinkPoint;
 
         private bool isSinking;
-        private bool isGameOver;
+        public bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
@@ -40,6 +39,9 @@ namespace Babel
 
         #region User Var;
         private float pumpPower = 1.5f;
+
+        public int InStageLootValue { get; private set; }
+
 
         #endregion
 
@@ -54,7 +56,7 @@ namespace Babel
 
         private void Start()
         {
-            Cam = Camera.main;
+            
         }
 
         private void FixedUpdate()
@@ -67,11 +69,9 @@ namespace Babel
             if (isGameOver)
             {
                 GameOverEffect();
-                CameraReset();
             }
             else
             {
-                CameraWork();
             }
         }
 
@@ -80,24 +80,6 @@ namespace Babel
 
 
         #region Custom Methods;
-
-
-        private void CameraWork()
-        {
-            Vector3 offset = new Vector3(0, 7, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, ship.transform.position + offset, 0.7f * Time.deltaTime);
-            lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
-            Cam.transform.position = lerpPos;
-        }
-
-        private void CameraReset()
-        {
-            Vector3 offset = new Vector3(0, 18, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 0.4f * Time.deltaTime);
-            lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
-            Cam.transform.position = lerpPos;
-        }
-
 
         private void IsDeckSinking()
         {
@@ -133,7 +115,7 @@ namespace Babel
                     if (sinkPoint > 0)
                     {
                         sinkPoint -= pumpPower * Time.deltaTime;
-                        Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
+                        //Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
                     }
                     else sinkPoint = 0;
 
@@ -143,7 +125,7 @@ namespace Babel
                     if (sinkPoint < 100)
                     {
                         sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f - (pumpPower / 100);
-                        Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
+                        //Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
                     }
                     else
                     {
@@ -208,6 +190,7 @@ namespace Babel
 
         public void GameOver()
         {
+            InStageLootValue = 0;
             UIManager.ShowResultWindow();
             for (int i = 0; i < enableObjects.Length; ++i)
             {
@@ -236,14 +219,22 @@ namespace Babel
             }
             UnityEngine.Cursor.visible = true;
             UnityEngine.Cursor.lockState = CursorLockMode.Confined;
-            Debug.Log($"GG");
         }
 
-
-        private void AddScore(int upgradeLevel)
+        public void AddLoot(int loot)
         {
-            score += scoreTable[upgradeLevel];
-            //scoreText.SetText($"{score}");
+            InStageLootValue += loot;
+            Debug.Log($"{loot} 획득! 현재 전리품 {InStageLootValue}");
+        }
+
+        public void LostLoot(int loot)
+        {
+            InStageLootValue -= loot;
+            Debug.Log($"{loot} 손실! 현재 전리품 {InStageLootValue}");
+            if (InStageLootValue < 0)
+            {
+                InStageLootValue = 0;
+            }
         }
 
         #endregion

@@ -72,7 +72,7 @@ namespace Babel
                 OnDispose();
                 instance = null;
                 isInitialized = false;
-                applicationIsQuitting = true;
+                //applicationIsQuitting = true;
             }
         }
 
