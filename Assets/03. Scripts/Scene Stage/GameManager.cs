@@ -1,8 +1,10 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UIElements;
 using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UIElements;
 using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
@@ -16,7 +18,9 @@ namespace Babel
 
         #region Refs and Var;
         
-        public StageUIManager UIManager;
+        public UIManager UIManager;
+        public TMP_Text lootValueText;
+        public TMP_Text resultLootValueText;
 
         public Block[] BallPrefabs;
         public int maxIndexInQueue = 4;
@@ -34,7 +38,10 @@ namespace Babel
         public GameObject ggScreen;
         
         private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
-        private int score;
+
+        private Coroutine countCoroutine;
+        private int currentDisplayedLoot = 0;
+
         #endregion
 
         #region User Var;
@@ -56,7 +63,8 @@ namespace Babel
 
         private void Start()
         {
-            
+            OnLootChanged += UpdateLootValue;
+            UpdateLootValue(InStageLootValue);
         }
 
         private void FixedUpdate()
@@ -80,6 +88,33 @@ namespace Babel
 
 
         #region Custom Methods;
+
+
+        private void UpdateLootValue(int targetLoot)
+        {
+            // 기존에 실행 중인 연출이 있다면 멈추고 새로 시작합니다 [4]
+            if (countCoroutine != null) StopCoroutine(countCoroutine);
+            countCoroutine = StartCoroutine(CountLootRoutine(targetLoot));
+        }
+
+        private IEnumerator CountLootRoutine(int targetLoot)
+        {
+            // 표시된 점수가 목표 점수와 같아질 때까지 반복합니다
+            while (currentDisplayedLoot != targetLoot)
+            {
+                if (currentDisplayedLoot < targetLoot)
+                    currentDisplayedLoot++;
+                else
+                    currentDisplayedLoot--;
+
+                // 텍스트 갱신
+                lootValueText.SetText($"{currentDisplayedLoot}");
+
+                // 한 프레임 대기하거나 특정 시간을 기다립니다 [3, 4]
+                yield return new WaitForSeconds(0.003f);
+            }
+            countCoroutine = null;
+        }
 
         private void IsDeckSinking()
         {
@@ -190,7 +225,11 @@ namespace Babel
 
         public void GameOver()
         {
+
             InStageLootValue = 0;
+            OnLootChanged?.Invoke(InStageLootValue);
+            resultLootValueText.SetText($"{InStageLootValue}");
+
             UIManager.ShowResultWindow();
             for (int i = 0; i < enableObjects.Length; ++i)
             {
@@ -224,18 +263,20 @@ namespace Babel
         public void AddLoot(int loot)
         {
             InStageLootValue += loot;
-            Debug.Log($"{loot} 획득! 현재 전리품 {InStageLootValue}");
+            OnLootChanged?.Invoke(InStageLootValue);
         }
 
         public void LostLoot(int loot)
         {
             InStageLootValue -= loot;
-            Debug.Log($"{loot} 손실! 현재 전리품 {InStageLootValue}");
+            OnLootChanged?.Invoke(InStageLootValue);
             if (InStageLootValue < 0)
             {
                 InStageLootValue = 0;
             }
         }
+
+        public event System.Action<int> OnLootChanged;
 
         #endregion
 
