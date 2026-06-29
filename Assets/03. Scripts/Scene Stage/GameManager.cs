@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms.Impl;
-using UnityEngine.UIElements;
+using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
@@ -17,7 +17,8 @@ namespace Babel
         }
 
         #region Refs and Var;
-        
+
+        public Image gaugeFillImage;
         public UIManager UIManager;
         public TMP_Text lootValueText;
         public TMP_Text resultLootValueText;
@@ -80,6 +81,7 @@ namespace Babel
             }
             else
             {
+                UpdateGauge();
             }
         }
 
@@ -171,7 +173,11 @@ namespace Babel
             }
         }
 
-
+        void UpdateGauge()
+        {
+            // Fill Amount는 0.0 ~ 1.0 사이의 값이여야 하므로 [현재값 / 최대값]으로 계산합니다.
+            gaugeFillImage.fillAmount = sinkPoint / 100;
+        }
 
         public Block GetNextBlock()
         {

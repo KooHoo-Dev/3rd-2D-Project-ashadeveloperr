@@ -29,16 +29,15 @@ namespace Babel
             rb.bodyType = RigidbodyType2D.Kinematic;
         }
 
-        public void Drop()
+        public void Launch(Vector2 force)
         {
             col.enabled = true;
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 1.0f;
 
-            // transform.SetParent()
-            // : 부모자식 관계를 형성해주는 함수 입니다. null 입력시
-            //  부모 transform이 없는 월드 최상위 개체가 됩니다
             transform.SetParent(null);
+
+            rb.AddForce(force, ForceMode2D.Impulse);
         }
 
         private void Update()
