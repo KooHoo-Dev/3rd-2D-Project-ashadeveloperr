@@ -82,7 +82,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 8957324059118975939, guid: f6b777ea7c40d034ab0cd61e5451472f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -185,3 +185,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Babel.Block
   level: 1
+  minRotationSpeed: 5
+  maxRotationSpeed: 30

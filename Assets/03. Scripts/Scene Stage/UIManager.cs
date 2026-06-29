@@ -5,8 +5,13 @@ using TMPro;
 namespace Babel
 {
 
-    public class UIManager : MonoBehaviour
+    public class UIManager : SingletonBase<UIManager>
     {
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+        }
+
         public GameObject resultScreen;
         public GameObject inGameUI;
 
@@ -20,6 +25,7 @@ namespace Babel
         private bool onResult = false;
 
         public Ship ship;
+
 
         private void Awake()
         {
@@ -51,8 +57,8 @@ namespace Babel
 
         private void CameraWork()
         {
-            Vector3 offset = new Vector3(0, 7, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, ship.transform.position + offset, 0.7f * Time.deltaTime);
+            Vector3 shipPosOffset = new Vector3(-15, 7, 0);
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, (ship.transform.position + shipPosOffset), 0.7f * Time.deltaTime);
             lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
             Cam.transform.position = lerpPos;
         }

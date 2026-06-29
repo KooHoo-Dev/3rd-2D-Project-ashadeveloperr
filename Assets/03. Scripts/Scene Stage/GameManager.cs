@@ -275,11 +275,11 @@ namespace Babel
         public void LostLoot(int loot)
         {
             InStageLootValue -= loot;
-            OnLootChanged?.Invoke(InStageLootValue);
             if (InStageLootValue < 0)
             {
                 InStageLootValue = 0;
             }
+            OnLootChanged?.Invoke(InStageLootValue);
         }
 
         public event System.Action<int> OnLootChanged;

@@ -1,27 +1,27 @@
 using System.Collections;
-using System.Collections.Generic; // List 사용을 위해 추가
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Babel
 {
-    [RequireComponent(typeof(LineRenderer))] // 자동으로 LineRenderer가 없으면 추가함
+    [RequireComponent(typeof(LineRenderer))]
     public class PlayerController : MonoBehaviour
     {
         #region Settings
 
-        [Header("Sling Settings (시각적 피드백)")]
-        public float maxDragDistance = 2.0f; // 마우스로 당길 수 있는 최대 거리
-        public float visualPullbackStrength = 0.5f; // 실제 드래그 거리 대비 오브젝트가 뒤로 밀리는 비율
+        //[Header("Sling Settings (시각적 피드백)")]
+        //public float maxDragDistance = 2.0f; // 마우스로 당길 수 있는 최대 거리
+        //public float visualPullbackStrength = 0.5f; // 실제 드래그 거리 대비 오브젝트가 뒤로 밀리는 비율
 
         [Header("Physics Settings (발사 세기)")]
-        public float forceMultiplier = 5.0f; // 드래그 거리에 따른 실제 힘 배율
-        public float maxForce = 20.0f;       // 최대 발사 제한 세기
+        public float forceMultiplier = 3.0f;
+        public float maxForce = 150.0f;
 
-        [Header("Trajectory Settings (궤적 예측)")]
-        public LineRenderer trajectoryLine;    // 궤적을 그릴 LineRenderer 레퍼런스
-        public int trajectoryPointCount = 30; // 궤적을 구성할 점의 개수 (많을수록 부드러움)
-        public float timeStepPerPoint = 0.1f; // 각 점 사이의 시간 간격 (초)
+        [Header("Trajectory Settings (궤적 포물선)")]
+        public LineRenderer trajectoryLine;
+        public int trajectoryPointCount = 30;
+        public float timeStepPerPoint = 0.1f;
 
         [Header("Ref")]
         public Transform spawnPoint; // 블록이 대기하는 기본 위치
@@ -40,16 +40,60 @@ namespace Babel
         {
             mainCamera = Camera.main;
 
-            // LineRenderer 설정 초기화
             if (trajectoryLine == null) trajectoryLine = GetComponent<LineRenderer>();
             trajectoryLine.positionCount = trajectoryPointCount;
-            trajectoryLine.enabled = false; // 평소에는 끔
+
+            // --- 궤적 스타일 자동 설정 (오렌지색 & 얇게) ---
+
+            // ⭐ [핵심 추가] 코드로 유니티 기본 스프라이트 머티리얼을 찾아서 라인렌더러에 강제 주입!
+            // 이 셰이더/머티리얼이 들어가야 오렌지색과 투명도(알파값)가 정상 작동합니다.
+            Shader spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader != null)
+            {
+                trajectoryLine.material = new Material(spriteShader);
+            }
+
+            // 1. 궤적 굵기 대폭 축소 (시작 두께 0.2, 끝 두께 0.01로 점점 얇아지게)
+            trajectoryLine.startWidth = 0.2f;
+            trajectoryLine.endWidth = 0.01f;
+
+            // 2. 부드러운 오렌지색 -> 투명 그라데이션 코드 자동 생성
+            Gradient orangeGradient = new Gradient();
+
+            // 색상 키: 시작(오렌지) -> 끝(오렌지)
+            GradientColorKey[] colorKeys = new GradientColorKey[2];
+            Color orangeColor = new Color(1.0f, 0.5f, 0.0f); // RGB 오렌지색
+            colorKeys[0] = new GradientColorKey(orangeColor, 0.0f);
+            colorKeys[1] = new GradientColorKey(orangeColor, 1.0f);
+
+            // 알파(투명도) 키: 시작(불투명) -> 끝(완전 투명)
+            GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
+            alphaKeys[0] = new GradientAlphaKey(1.0f, 0.0f); // 0% 지점: 선명함
+            alphaKeys[1] = new GradientAlphaKey(0.0f, 1.0f); // 100% 지점: 투명함
+
+            orangeGradient.SetKeys(colorKeys, alphaKeys);
+            trajectoryLine.colorGradient = orangeGradient;
+
+            // 3. 선이 각지지 않고 둥글게 표현되도록 설정
+            trajectoryLine.numCornerVertices = 5;
+            trajectoryLine.numCapVertices = 5;
+
+            trajectoryLine.enabled = false;
 
             SpawnBlock();
         }
 
         private void Update()
         {
+            // ⭐ [추가] 조준하거나 발사할 블록이 없다면 마우스 입력을 전부 무시합니다.
+            if (currentBlock == null)
+            {
+                // 혹시 마우스를 뗐을 때 궤적이 남아있지 않도록 꺼주는 안전장치
+                if (trajectoryLine.enabled) trajectoryLine.enabled = false;
+                isDragging = false;
+                return;
+            }
+
             // 1. 마우스 클릭 시 (드래그 시작)
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
@@ -63,7 +107,7 @@ namespace Babel
                     FireBlock();
                 }
             }
-            // 3. 드래그 중일 때 (시각적 피드백 & 궤적 그리기)
+            // 3. 드래그 중일 때
             else if (Mouse.current.leftButton.isPressed && isDragging)
             {
                 OnDragging();
@@ -86,10 +130,14 @@ namespace Babel
             Vector2 currentMousePos = GetMouseWorldPosition();
             Vector2 dragVector = dragStartPos - currentMousePos;
 
-            // ⭐ [추가] X축이 마이너스 방향(뒤쪽)이라면 0으로 고정하여 뒤로 발사되지 않게 막음
-            if (dragVector.x < 5)
+            if (dragVector.x < 0)
             {
-                dragVector.x = 5;
+                dragVector.x = 0;
+            }
+
+            if (currentBlock != null)
+            {
+                currentBlock.transform.localPosition = Vector3.zero;
             }
 
             Vector2 predictedForce = dragVector * forceMultiplier;
@@ -101,7 +149,7 @@ namespace Babel
             float blockMass = (currentBlock != null) ? currentBlock.GetComponent<Rigidbody2D>().mass : 1.0f;
             Vector2 initialVelocity = predictedForce / blockMass;
 
-            DrawTrajectory(currentBlock.transform.position, initialVelocity);
+            DrawTrajectory(spawnPoint.position, initialVelocity);
         }
 
         private void FireBlock()
@@ -114,10 +162,10 @@ namespace Babel
             Vector2 currentMousePos = GetMouseWorldPosition();
             Vector2 dragVector = dragStartPos - currentMousePos;
 
-            // ⭐ [추가] 마우스를 오른쪽으로 당겨서 X축 발사 방향이 마이너스가 된 경우 방어
-            if (dragVector.x < 5)
+            // ⭐ [수정] 발사할 때도 마찬가지로 왼쪽(뒤) 발사를 차단합니다.
+            if (dragVector.x < 10)
             {
-                dragVector.x = 5;
+                dragVector.x = 10;
             }
 
             // 최종 날아갈 방향과 크기 계산
