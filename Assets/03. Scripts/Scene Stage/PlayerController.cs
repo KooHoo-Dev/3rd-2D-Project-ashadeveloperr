@@ -179,6 +179,8 @@ namespace Babel
             // 블록 발사!
             currentBlock.Launch(shootForce);
 
+            UIManager.Instance.SetCameraTarget(currentBlock.transform, UIManager.Instance.blockOffset);
+
             StartCoroutine(SpawnDelayCoroutine(currentBlock));
             currentBlock = null;
         }
@@ -206,6 +208,8 @@ namespace Babel
                 if (dropBlock == null || dropBlock.HasFirstContact || dropBlock.HasLost) break;
                 yield return null;
             }
+
+            UIManager.Instance.SetCameraTarget(UIManager.Instance.ship.transform, UIManager.Instance.shipPosOffset);
 
             SpawnBlock();
         }
