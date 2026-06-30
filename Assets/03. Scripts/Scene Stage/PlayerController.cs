@@ -15,7 +15,7 @@ namespace Babel
         //public float visualPullbackStrength = 0.5f; // 실제 드래그 거리 대비 오브젝트가 뒤로 밀리는 비율
 
         [Header("Physics Settings (발사 세기)")]
-        public float forceMultiplier = 3.0f;
+        public float forceMultiplier = 30.0f;
         public float maxForce = 150.0f;
 
         [Header("Trajectory Settings (궤적 포물선)")]
@@ -127,6 +127,10 @@ namespace Babel
 
         private void OnDragging()
         {
+            Rigidbody2D BlockRB = currentBlock.GetComponent<Rigidbody2D>();
+            forceMultiplier = BlockRB.mass / 1.5f;
+            maxForce = BlockRB.mass * 30;
+
             Vector2 currentMousePos = GetMouseWorldPosition();
             Vector2 dragVector = dragStartPos - currentMousePos;
             UIManager.Instance.SetCameraTarget(currentBlock.transform, UIManager.Instance.throwerOffset, 25f);

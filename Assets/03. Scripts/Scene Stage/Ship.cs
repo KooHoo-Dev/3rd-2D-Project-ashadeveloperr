@@ -34,20 +34,38 @@ namespace Babel
             rb.gravityScale = rb.mass / 5000;
             Debug.Log($"현재 배 무게 {rb.mass}");
             if (rb == null) rb = GetComponent<Rigidbody2D>();
-            baseBuoyancy = rb.mass * 0.3f;
+            baseBuoyancy = rb.mass * 0.75f;
         }
 
         private void FixedUpdate()
         {
             ApplyPointBuoyancy(leftBuoyancyPoint);
             ApplyPointBuoyancy(rightBuoyancyPoint);
-
+            UpdateGravityBasedOnDepth();
         }
 
         #endregion
 
 
         #region Custom Methods
+
+        private void UpdateGravityBasedOnDepth()
+        {
+            if (GameManager.Instance.isGameOver) return;
+            float shipFlying = transform.position.y;
+
+            if (shipFlying > 0)
+            {
+                float t = Mathf.Clamp01(shipFlying / 2.5f);
+
+                rb.gravityScale = Mathf.Lerp(0.1f, 0.5f, t);
+            }
+            else
+            {
+                rb.gravityScale = 0.1f;
+            }
+
+        }
 
         private void ApplyPointBuoyancy(Transform buoyancyPoint)
         {
