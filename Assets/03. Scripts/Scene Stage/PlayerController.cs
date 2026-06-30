@@ -55,7 +55,7 @@ namespace Babel
             }
 
             // 1. 궤적 굵기 대폭 축소 (시작 두께 0.2, 끝 두께 0.01로 점점 얇아지게)
-            trajectoryLine.startWidth = 0.2f;
+            trajectoryLine.startWidth = 0.25f;
             trajectoryLine.endWidth = 0.01f;
 
             // 2. 부드러운 오렌지색 -> 투명 그라데이션 코드 자동 생성
@@ -63,13 +63,14 @@ namespace Babel
 
             // 색상 키: 시작(오렌지) -> 끝(오렌지)
             GradientColorKey[] colorKeys = new GradientColorKey[2];
-            Color orangeColor = new Color(1.0f, 0.5f, 0.0f); // RGB 오렌지색
+            Color orangeColor = new Color(1.0f, 0.5f, 0.0f);
+            Color yellowColor = new Color(1.0f, 1.0f, 0.0f);
             colorKeys[0] = new GradientColorKey(orangeColor, 0.0f);
-            colorKeys[1] = new GradientColorKey(orangeColor, 1.0f);
+            colorKeys[1] = new GradientColorKey(yellowColor, 1.0f);
 
             // 알파(투명도) 키: 시작(불투명) -> 끝(완전 투명)
             GradientAlphaKey[] alphaKeys = new GradientAlphaKey[2];
-            alphaKeys[0] = new GradientAlphaKey(1.0f, 0.0f); // 0% 지점: 선명함
+            alphaKeys[0] = new GradientAlphaKey(0.75f, 0.0f); // 0% 지점: 선명함
             alphaKeys[1] = new GradientAlphaKey(0.0f, 1.0f); // 100% 지점: 투명함
 
             orangeGradient.SetKeys(colorKeys, alphaKeys);
@@ -98,6 +99,7 @@ namespace Babel
             // 1. 마우스 클릭 시 (드래그 시작)
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
+                if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) return;
                 StartDrag();
             }
             // 2. 마우스 버튼을 뗄 때 (발사)
@@ -121,7 +123,6 @@ namespace Babel
 
         private void StartDrag()
         {
-            if (UIManager.Instance.onPause) return;
             dragStartPos = GetMouseWorldPosition();
             isDragging = true;
             trajectoryLine.enabled = true; // 조준 시작 시 궤적 켬
@@ -129,6 +130,7 @@ namespace Babel
 
         private void OnDragging()
         {
+            if (isDragging == false) return;
             Rigidbody2D BlockRB = currentBlock.GetComponent<Rigidbody2D>();
             forceMultiplier = BlockRB.mass / 1.5f;
             maxForce = BlockRB.mass * 30;
