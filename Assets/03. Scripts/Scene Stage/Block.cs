@@ -94,12 +94,14 @@ namespace Babel
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (GameManager.Instance.isGameOver) return;
-            if (HasLost) return;
 
-            if (HasLost == false && collision.CompareTag("Underwater"))
+            if (collision.CompareTag("Underwater") && HasLost == false)
             {
                 HasLost = true;
-                GameManager.Instance.LostLoot(blockValue);
+                if (HasFirstContact)
+                {
+                    GameManager.Instance.LostLoot(blockValue);
+                }
             }
         }
     }

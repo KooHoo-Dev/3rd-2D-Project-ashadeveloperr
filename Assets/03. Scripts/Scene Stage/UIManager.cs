@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.InputSystem;
 
 namespace Babel
 {
@@ -14,15 +15,18 @@ namespace Babel
 
         public GameObject resultScreen;
         public GameObject inGameUI;
+        public GameObject pauseUI;
+        public GameObject pauseUIScreen;
+        public TMP_Text NextStageText;
 
         private Camera Cam { get; set; }
         private RectTransform resultScreenRectTransform;
         private RectTransform inGameUIRectTransform;
 
-        private float lerpSpeed = 1.4f;
         private Vector2 resultScreenRootPosition;
         private Vector2 inGameUIRootPosition;
         private bool onResult = false;
+        public bool onPause = false;
 
         public Ship ship;
 
@@ -36,6 +40,8 @@ namespace Babel
 
         protected override void Awake()
         {
+            Time.timeScale = 1.0f;
+            onPause = false;
             Cam = Camera.main;
             resultScreenRectTransform = resultScreen.GetComponent<RectTransform>();
             inGameUIRectTransform = inGameUI.GetComponent<RectTransform>();
@@ -60,7 +66,34 @@ namespace Babel
             {
                 SetInGameUI();
                 CameraWork();
+
+                if (Keyboard.current.escapeKey.wasPressedThisFrame)
+                {
+                    TogglePause();
+                }
             }
+        }
+
+        public void TogglePause()
+        {
+            if (onPause) Resume();
+            else Pause();
+        }
+
+        private void Pause()
+        {
+            Time.timeScale = 0.0f;
+            pauseUI.SetActive(true);
+            pauseUIScreen.SetActive(true);
+            onPause = true;
+        }
+
+        private void Resume()
+        {
+            Time.timeScale = 1.0f;
+            pauseUI.SetActive(false);
+            pauseUIScreen.SetActive(false);
+            onPause = false;
         }
 
         public void SetCameraTarget(Transform newTarget, Vector3 offset, float size)
@@ -98,6 +131,15 @@ namespace Babel
 
         public void ShowResultWindow()
         {
+            if (GameManager.Instance.isGameOver)
+            {
+                NextStageText.SetText("Retry");
+            }
+            else
+            {
+                NextStageText.SetText("Next");
+            }
+
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
 
@@ -112,11 +154,11 @@ namespace Babel
             {
                 if (Vector2.Distance(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition) >= 0.1f)
                 {
-                    resultScreenRectTransform.anchoredPosition = Vector2.Lerp(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition, Time.deltaTime * lerpSpeed);
+                    resultScreenRectTransform.anchoredPosition = Vector2.Lerp(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition, Time.deltaTime * 1.25f);
                 }
                 if (Vector2.Distance(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition) >= 0.1f)
                 {
-                    inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * lerpSpeed);
+                    inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.2f);
                 }
             }
             else
@@ -134,7 +176,7 @@ namespace Babel
         {
             if (Vector2.Distance(inGameUIRectTransform.anchoredPosition, resultScreenRootPosition) >= 0.1f)
             {
-                inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * lerpSpeed);
+                inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.7f);
             }
         }
     }

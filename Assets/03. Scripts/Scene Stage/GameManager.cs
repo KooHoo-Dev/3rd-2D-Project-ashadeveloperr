@@ -194,44 +194,12 @@ namespace Babel
             return BallPrefabs[index];
         }
 
-        // ballA 개체와 ballB 개체의 병합을 진행
-        //public void MergeBall(Block blockA, Block blockB)
-        //{
-        //    // 두 개체를 병합 진행 상태로 선언
-        //    blockA.IsMerged = true;
-        //    blockB.IsMerged = true;
-
-        //    // 삭제하기 전에 중간 지점을 지역 변수로 저장
-        //    Vector3 centerPos = (blockA.transform.position + blockB.transform.position) / 2;
-
-        //    // 무엇을 생성할지 입력
-        //    int upgradeLevel = blockA.level;
-        //    Block upgradeBall = GetBlock(upgradeLevel);
-        //    AddScore(upgradeLevel);
-
-        //    // 기존 볼들 삭제
-        //    blockA.gameObject.SetActive(false);
-        //    blockB.gameObject.SetActive(false);
-        //    // 두 개체를 비활성화해주는 이유는 삭제가 느려서 충돌 안일어나게 하려고 일단 비활성화 후 안전하게 삭제하기 위함임
-
-        //    Destroy(blockA.gameObject);
-        //    Destroy(blockB.gameObject);
-
-        //    // 상위 볼 생성
-        //    Block spawnedBall = Instantiate(upgradeBall, centerPos, Quaternion.identity);
-        //    spawnedBall.Drop();
-
-        //}
-
-        // 게임 오버가 되면 활성화될 개체들과 비활성화될 개체들
-
         [Header("GameOver Settings")]
         public GameObject[] enableObjects;
         public GameObject[] disableObjects;
 
         public void GameOver()
         {
-
             InStageLootValue = 0;
             OnLootChanged?.Invoke(InStageLootValue);
             resultLootValueText.SetText($"{InStageLootValue}");
@@ -253,7 +221,7 @@ namespace Babel
             SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
             Color screenColor = screenSR.color;
             
-            if (ship.rb.gravityScale < 5.0f)
+            if (ship.rb.gravityScale < 10.0f)
             {
                 ship.rb.gravityScale += 0.3f * Time.deltaTime;
             }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
 namespace Babel
 {
@@ -120,6 +121,7 @@ namespace Babel
 
         private void StartDrag()
         {
+            if (UIManager.Instance.onPause) return;
             dragStartPos = GetMouseWorldPosition();
             isDragging = true;
             trajectoryLine.enabled = true; // 조준 시작 시 궤적 켬
