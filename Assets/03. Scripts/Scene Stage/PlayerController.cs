@@ -129,6 +129,7 @@ namespace Babel
         {
             Vector2 currentMousePos = GetMouseWorldPosition();
             Vector2 dragVector = dragStartPos - currentMousePos;
+            UIManager.Instance.SetCameraTarget(currentBlock.transform, UIManager.Instance.throwerOffset, 25f);
 
             if (dragVector.x < 0)
             {
@@ -176,10 +177,9 @@ namespace Babel
                 shootForce = shootForce.normalized * maxForce;
             }
 
-            // 블록 발사!
             currentBlock.Launch(shootForce);
 
-            UIManager.Instance.SetCameraTarget(currentBlock.transform, UIManager.Instance.blockOffset);
+            UIManager.Instance.SetCameraTarget(currentBlock.transform, UIManager.Instance.blockOffset, 18f);
 
             StartCoroutine(SpawnDelayCoroutine(currentBlock));
             currentBlock = null;
@@ -209,7 +209,7 @@ namespace Babel
                 yield return null;
             }
 
-            UIManager.Instance.SetCameraTarget(UIManager.Instance.ship.transform, UIManager.Instance.shipPosOffset);
+            UIManager.Instance.SetCameraTarget(UIManager.Instance.ship.transform, UIManager.Instance.shipPosOffset, 20f);
 
             SpawnBlock();
         }

@@ -31,6 +31,8 @@ namespace Babel
         public Vector3 shipPosOffset = new Vector3(-10, 7, 0);
         public Vector3 throwerOffset = new Vector3(-15, 7, 0);
         public Vector3 blockOffset = new Vector3(0, 0, 0);
+        private float currentCamZoom = 20;
+        private float currentCamZoomTarget = 20;
 
         protected override void Awake()
         {
@@ -45,7 +47,7 @@ namespace Babel
             float screenHeight = canvasRect.rect.height;
 
             inGameUIRectTransform.anchoredPosition = new Vector2(0, screenHeight);
-            SetCameraTarget(ship.transform, shipPosOffset);
+            SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
         }
         private void Update()
         {
@@ -61,12 +63,13 @@ namespace Babel
             }
         }
 
-        public void SetCameraTarget(Transform newTarget, Vector3 offset)
+        public void SetCameraTarget(Transform newTarget, Vector3 offset, float size)
         {
             if (newTarget != null)
             {
                 currentTarget = newTarget;
                 currentOffset = offset;
+                currentCamZoomTarget = size;
             }
         }
 
@@ -74,11 +77,13 @@ namespace Babel
         {
             if (currentTarget == null)
             {
-                SetCameraTarget(ship.transform, shipPosOffset);
+                SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
             }
 
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, (currentTarget.position + currentOffset), 2.5f * Time.deltaTime); // 이동 속감을 위해 스피드를 살짝 올렸삼 (기존 0.7f)
+            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, (currentTarget.position + currentOffset), 1.8f * Time.deltaTime);
             lerpPos.z = Cam.transform.position.z;
+            Cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
+            currentCamZoom = Cam.orthographicSize;
             Cam.transform.position = lerpPos;
         }
 
@@ -86,7 +91,8 @@ namespace Babel
         {
             Vector3 offset = new Vector3(0, 18, 0);
             Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 0.4f * Time.deltaTime);
-            lerpPos.z = Cam.transform.position.z;  // 2D니까 z값은 바뀔 필요 없음
+            lerpPos.z = Cam.transform.position.z;
+            Cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
             Cam.transform.position = lerpPos;
         }
 
