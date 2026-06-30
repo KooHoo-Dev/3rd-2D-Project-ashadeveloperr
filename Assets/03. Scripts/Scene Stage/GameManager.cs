@@ -28,9 +28,8 @@ namespace Babel
 
         public Ship ship;
 
-        private float sinkPoint;
+        public float sinkPoint;
 
-        private bool isSinking;
         public bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
@@ -134,11 +133,9 @@ namespace Babel
                 {
                     SinkingEffect(ship.deckRight);
                 }
-                isSinking = true;
             }
             else
             {
-                isSinking = false;
                 SinkingEffect(null);
             }
         }
@@ -230,8 +227,6 @@ namespace Babel
                 screenColor.a += 0.15f * Time.deltaTime;
                 screenSR.color = screenColor;
             }
-            UnityEngine.Cursor.visible = true;
-            UnityEngine.Cursor.lockState = CursorLockMode.Confined;
         }
 
         public void AddLoot(int loot)

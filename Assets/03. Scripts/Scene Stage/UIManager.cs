@@ -16,15 +16,18 @@ namespace Babel
         public GameObject resultScreen;
         public GameObject inGameUI;
         public GameObject pauseUI;
+        public GameObject InteractUIRight;
         public GameObject pauseUIScreen;
         public TMP_Text NextStageText;
 
         private Camera Cam { get; set; }
         private RectTransform resultScreenRectTransform;
         private RectTransform inGameUIRectTransform;
+        private RectTransform InteractUIRightRectTransform;
 
         private Vector2 resultScreenRootPosition;
         private Vector2 inGameUIRootPosition;
+        private Vector2 interactUIRightRootPosition;
         private bool onResult = false;
         public bool onPause = false;
 
@@ -45,14 +48,17 @@ namespace Babel
             Cam = Camera.main;
             resultScreenRectTransform = resultScreen.GetComponent<RectTransform>();
             inGameUIRectTransform = inGameUI.GetComponent<RectTransform>();
+            InteractUIRightRectTransform = InteractUIRight.GetComponent<RectTransform>();
         }
 
         private void Start()
         {
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
+            float screenWidth = canvasRect.rect.width;
 
             inGameUIRectTransform.anchoredPosition = new Vector2(0, screenHeight);
+            InteractUIRightRectTransform.anchoredPosition = new Vector2(0, screenWidth);
             SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
         }
         private void Update()
@@ -72,6 +78,8 @@ namespace Babel
                     TogglePause();
                 }
             }
+            SinkingUI();
+            
         }
 
         public void TogglePause()
@@ -142,9 +150,11 @@ namespace Babel
 
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
+            float screenWidth = canvasRect.rect.width;
 
             resultScreenRootPosition = Vector2.zero;
             inGameUIRootPosition = new Vector2(0, screenHeight);
+            interactUIRightRootPosition = new Vector2(0, screenWidth);
             onResult = true;
         }
         
@@ -160,6 +170,10 @@ namespace Babel
                 {
                     inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.2f);
                 }
+                if (Vector2.Distance(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
+                {
+                    inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.2f);
+                }
             }
             else
             {
@@ -167,8 +181,8 @@ namespace Babel
                 float screenHeight = canvasRect.rect.height;
 
                 resultScreenRectTransform.anchoredPosition = new Vector2(0, -screenHeight);
-
                 resultScreenRootPosition = resultScreenRectTransform.anchoredPosition;
+
             }
         }
 
@@ -177,6 +191,29 @@ namespace Babel
             if (Vector2.Distance(inGameUIRectTransform.anchoredPosition, resultScreenRootPosition) >= 0.1f)
             {
                 inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.7f);
+            }
+        }
+
+        private void SinkingUI()
+        {
+            
+
+            if (GameManager.Instance.sinkPoint > 0)
+            {
+                InteractUIRightRectTransform.anchoredPosition = Vector2.zero;
+            }
+            else
+            {
+                RectTransform canvasRect = GetComponent<RectTransform>();
+                float screenWidth = canvasRect.rect.width;
+
+                InteractUIRightRectTransform.anchoredPosition = new Vector2(0, screenWidth);
+            }
+
+
+            if (Vector2.Distance(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
+            {
+                InteractUIRightRectTransform.anchoredPosition = Vector2.Lerp(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.7f);
             }
         }
     }
