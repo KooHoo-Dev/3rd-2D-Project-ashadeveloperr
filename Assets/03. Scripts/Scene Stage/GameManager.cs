@@ -220,7 +220,7 @@ namespace Babel
             
             if (ship.rb.gravityScale < 10.0f)
             {
-                ship.rb.gravityScale += 0.3f * Time.deltaTime;
+                ship.rb.gravityScale += 0.7f * Time.deltaTime;
             }
             if (screenColor.a < 0.8f)
             {

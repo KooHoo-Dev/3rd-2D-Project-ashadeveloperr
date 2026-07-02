@@ -45,6 +45,14 @@ namespace Babel
             }
         }
 
+        private void OnEnable()
+        {
+            float randomScale = Random.Range(0.8f, 1.2f);
+            transform.localScale = Vector3.one * randomScale;
+
+            rb.mass *= randomScale;
+        }
+
         // ⭐ [수정] PlayerController가 호출하던 Launch 함수에 물리 회전 추가
         public void Launch(Vector2 force)
         {

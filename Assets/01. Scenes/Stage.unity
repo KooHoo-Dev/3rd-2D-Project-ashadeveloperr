@@ -2075,7 +2075,7 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5, y: 43, z: -10}
+  m_LocalPosition: {x: 0, y: 55, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2512,6 +2512,39 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 581080084}
   m_CullTransparentMesh: 1
+--- !u!1 &618356317
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 618356318}
+  m_Layer: 0
+  m_Name: CloudsLayer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &618356318
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 618356317}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1397633797}
+  - {fileID: 1782833760}
+  m_Father: {fileID: 2002894858}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &669754928
 GameObject:
   m_ObjectHideFlags: 0
@@ -4186,6 +4219,7 @@ MonoBehaviour:
   - {fileID: 7660311145588841664, guid: 0e095819adae50649ac74b1fa2a68f8c, type: 3}
   maxIndexInQueue: 4
   ship: {fileID: 156850917}
+  sinkPoint: 0
   isGameOver: 0
   ggScreen: {fileID: 1894597054}
   enableObjects:
@@ -4257,8 +4291,8 @@ Transform:
   m_GameObject: {fileID: 1158543511}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -19.16, z: 0}
-  m_LocalScale: {x: 500, y: 40, z: 1}
+  m_LocalPosition: {x: 0, y: -200, z: 0}
+  m_LocalScale: {x: 500, y: 400, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1047304524}
@@ -4359,7 +4393,7 @@ SpriteRenderer:
   m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.010946936, g: 0.6491208, b: 0.7735849, a: 0.6509804}
+  m_Color: {r: 0.10898005, g: 0.64347434, b: 0.745283, a: 0.7647059}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5023,6 +5057,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1366127639}
   m_CullTransparentMesh: 1
+--- !u!1 &1397633796
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1397633797}
+  m_Layer: 0
+  m_Name: CloudPivotLeft
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1397633797
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1397633796}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -52, y: 14.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 618356318}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1400519090
 GameObject:
   m_ObjectHideFlags: 0
@@ -5049,8 +5114,8 @@ Transform:
   m_GameObject: {fileID: 1400519090}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 59.4, z: 0}
-  m_LocalScale: {x: 27.439999, y: 22.638, z: 2.2637997}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 484.84845, y: 400, z: 39.999992}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1047304524}
@@ -5102,14 +5167,14 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -5
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -3864740069685514202, guid: 639d3ef34aabd364c8605905bd06bcbe, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Color: {r: 0.41037738, g: 0.844117, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 10.8, y: 19.2}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -6380,6 +6445,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1782750160}
   m_CullTransparentMesh: 0
+--- !u!1 &1782833759
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1782833760}
+  m_Layer: 0
+  m_Name: CloudPivotRight
+  m_TagString: Untagged
+  m_Icon: {fileID: 5132851093641282708, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1782833760
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782833759}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 135.3, y: 14.1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 618356318}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1893696491
 GameObject:
   m_ObjectHideFlags: 0
@@ -6929,6 +7025,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2002894858}
   - component: {fileID: 2002894859}
+  - component: {fileID: 2002894860}
   m_Layer: 0
   m_Name: SceneManager
   m_TagString: Untagged
@@ -6948,7 +7045,8 @@ Transform:
   m_LocalPosition: {x: -4.92802, y: 0.68179, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 618356318}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2002894859
@@ -6963,6 +7061,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beda22f2ddb0de048beeb63728c5bd84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Babel.SceneController
+--- !u!114 &2002894860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2002894857}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d0dffa00eb077c43b28fbe494e15ca2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::G
+  flowSpeed: 2
+  flowDirection: {x: -1, y: 0, z: 0}
+  CloudPivotLeft: {fileID: 1397633797}
+  CloudPivotRight: {fileID: 1782833760}
+  cloudPrefab: {fileID: 781654996479968413, guid: 5aacbd257fed2874893ecc695457096c, type: 3}
+  cloudLayer: {fileID: 618356317}
+  totalCloud: 10
 --- !u!1 &2026315986
 GameObject:
   m_ObjectHideFlags: 0
