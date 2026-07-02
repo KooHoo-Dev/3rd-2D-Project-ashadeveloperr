@@ -22,6 +22,14 @@ namespace Babel
 
         public int CurrentStageLevel { get; private set; } = 0;
 
+
+
+        protected override void Awake()
+        {
+            base.Awake();
+            DontDestroyOnLoad(gameObject);
+        }
+
         public int TotalMaintenanceCost()
         {
             MaintenanceCost = (CurrentLevelPump * 100) + (CurrentLevelInsurance * 250);
@@ -33,11 +41,7 @@ namespace Babel
             PlayerGold += amount;
         }
 
-        protected override void OnInitialize()
-        {
-            base.OnInitialize();
-            DontDestroyOnLoad(gameObject);
-        }
+
 
 
 

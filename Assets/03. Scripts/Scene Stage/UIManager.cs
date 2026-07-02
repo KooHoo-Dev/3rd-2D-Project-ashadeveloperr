@@ -43,6 +43,7 @@ namespace Babel
 
         protected override void Awake()
         {
+
             Time.timeScale = 1.0f;
             onPause = false;
             Cam = Camera.main;

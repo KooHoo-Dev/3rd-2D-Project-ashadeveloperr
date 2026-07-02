@@ -34,9 +34,10 @@ namespace Babel
 
         private void Start()
         {
+            rb = GetComponent<Rigidbody2D>();
+
             rb.mass = transform.localScale.x * transform.localScale.y * 10.0f;
             rb.gravityScale = rb.mass / 5000;
-            if (rb == null) rb = GetComponent<Rigidbody2D>();
             baseBuoyancy = rb.mass * 0.55f;
         }
 

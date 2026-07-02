@@ -8,6 +8,8 @@ namespace Babel
         public bool HasFirstContact { get; private set; } = false;
         public bool HasLost { get; private set; } = false;
 
+        private float baseMass;
+
         [Header("Rotation Settings")]
         public float minRotationSpeed = 5f; // 최소 회전 속도
         public float maxRotationSpeed = 30f; // 최대 회전 속도
@@ -20,6 +22,7 @@ namespace Babel
         private Rigidbody2D rb;
         private Collider2D col;
 
+
         private void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
@@ -27,7 +30,7 @@ namespace Babel
             col.enabled = false;
             rb.gravityScale = 0.0f;
             rb.bodyType = RigidbodyType2D.Kinematic;
-
+            baseMass = rb.mass;
             float randomSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
             float randomDirection = Random.Range(-1, 1) >= 0 ? 1f : -1f;
             assignedAngularVelocity = randomSpeed * randomDirection;
@@ -48,7 +51,7 @@ namespace Babel
             float randomScale = Random.Range(0.8f, 1.2f);
             transform.localScale = Vector3.one * randomScale;
 
-            rb.mass *= randomScale;
+            rb.mass = baseMass * randomScale;
         }
 
         // ⭐ [수정] PlayerController가 호출하던 Launch 함수에 물리 회전 추가

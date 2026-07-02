@@ -23,24 +23,27 @@ namespace Babel
         public TMP_Text lootValueText;
         public TMP_Text resultLootValueText;
 
-        public Block[] BallPrefabs;
-        private int maxIndexInQueue = TotalGameManager.Instance.CurrentStageLevel + 1;
+        public Block[] BlockPrefabs;
+        private int maxIndexInQueue = 1;
 
         public Ship ship;
-
+        public GameObject ggScreen;
         public float sinkPoint;
-
         public bool isGameOver;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
 
-        public GameObject ggScreen;
-        
-        private Dictionary<int, int> scoreTable = new Dictionary<int, int>();
-
         private Coroutine countCoroutine;
         private int currentDisplayedLoot = 0;
+
+        [Header("게임 오버 타이머")]
+
+        [SerializeField] private float stageTimeLimit = 60f;
+        [SerializeField] private TMP_Text timerText;
+        public float RemainingTime { get; private set; }
+        public bool isStageClear { get; private set; }
+        public bool IsStageEnded => isGameOver || isStageClear;
 
         #endregion
 
@@ -56,7 +59,8 @@ namespace Babel
 
         protected override void Awake()
         {
-            maxIndexInQueue = Mathf.Min(maxIndexInQueue, BallPrefabs.Length);
+
+            maxIndexInQueue = Mathf.Min(maxIndexInQueue, BlockPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
 
@@ -189,8 +193,8 @@ namespace Babel
 
         private Block GetBlock(int index)
         {
-            if (index < 0 || BallPrefabs.Length <= index) return BallPrefabs[0];
-            return BallPrefabs[index];
+            if (index < 0 || BlockPrefabs.Length <= index) return BlockPrefabs[0];
+            return BlockPrefabs[index];
         }
 
         [Header("GameOver Settings")]
