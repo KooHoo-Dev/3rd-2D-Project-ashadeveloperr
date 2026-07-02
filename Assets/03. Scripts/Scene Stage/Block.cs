@@ -28,7 +28,6 @@ namespace Babel
             rb.gravityScale = 0.0f;
             rb.bodyType = RigidbodyType2D.Kinematic;
 
-            // ⭐ [추가] 생성되자마자 이 블록이 가질 고유한 회전 속도와 방향(양수/음수)을 무작위로 결정
             float randomSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
             float randomDirection = Random.Range(-1, 1) >= 0 ? 1f : -1f;
             assignedAngularVelocity = randomSpeed * randomDirection;
@@ -38,8 +37,7 @@ namespace Babel
         {
             IsUnderWater();
 
-            // ⭐ [추가] 발사되기 전(Kinematic 상태)에는 트랜스폼을 이용해 시각적으로 돌려줍니다.
-            if (!isFired)
+            if (isFired == false)
             {
                 transform.Rotate(Vector3.forward * assignedAngularVelocity * Time.deltaTime);
             }

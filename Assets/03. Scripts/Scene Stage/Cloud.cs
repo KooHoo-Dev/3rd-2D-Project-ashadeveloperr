@@ -6,8 +6,8 @@ namespace Babel
 
     public class Cloud : MonoBehaviour
     {
-        [SerializeField] private float minScale = 0.6f;
-        [SerializeField] private float maxScale = 1.0f;
+        private float minScale = 0.6f;
+        private float maxScale = 1.0f;
 
         SpriteRenderer spriteRenderer;
 

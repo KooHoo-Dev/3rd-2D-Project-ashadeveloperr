@@ -313,7 +313,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Resume
+  m_text: Shop
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -405,7 +405,7 @@ GameObject:
   - component: {fileID: 174516778}
   - component: {fileID: 174516777}
   m_Layer: 5
-  m_Name: GameOverText
+  m_Name: TitleText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -423,12 +423,12 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 898196116}
+  m_Father: {fileID: 1539957191}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.1, y: 0.6}
   m_AnchorMax: {x: 0.9, y: 0.9}
-  m_AnchoredPosition: {x: 0, y: 78.31755}
-  m_SizeDelta: {x: 560.00006, y: 93.98103}
+  m_AnchoredPosition: {x: 0, y: -9.113403}
+  m_SizeDelta: {x: 0.00012207031, y: -10.936081}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &174516777
 MonoBehaviour:
@@ -783,7 +783,6 @@ GameObject:
   m_Component:
   - component: {fileID: 898196116}
   - component: {fileID: 898196118}
-  - component: {fileID: 898196117}
   m_Layer: 5
   m_Name: Root
   m_TagString: Untagged
@@ -803,7 +802,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 174516776}
   - {fileID: 1533595764}
   m_Father: {fileID: 1539957191}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -812,19 +810,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &898196117
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 898196115}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 82819de787210e34d896ba59c5424469, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Babel.MainMenuUIManager
-  cameraTargetPivot: {fileID: 1729919968}
 --- !u!114 &898196118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -850,7 +835,7 @@ GameObject:
   - component: {fileID: 973794149}
   - component: {fileID: 973794148}
   m_Layer: 5
-  m_Name: Button_Resume
+  m_Name: Button_Shop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -919,7 +904,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 973794149}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 898196118}
+        m_TargetAssemblyTypeName: Babel.SceneController, Assembly-CSharp
+        m_MethodName: ChangeScene
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &973794149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1394,6 +1391,7 @@ GameObject:
   - component: {fileID: 1539957190}
   - component: {fileID: 1539957189}
   - component: {fileID: 1539957188}
+  - component: {fileID: 1539957192}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1477,6 +1475,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1575031711}
+  - {fileID: 174516776}
   - {fileID: 898196116}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1485,6 +1484,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1539957192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1539957187}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82819de787210e34d896ba59c5424469, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Babel.MainMenuUIManager
+  cameraTargetPivot: {fileID: 1729919968}
 --- !u!1 &1575031708
 GameObject:
   m_ObjectHideFlags: 0

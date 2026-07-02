@@ -21,12 +21,16 @@ namespace Babel
         public float waterResist = 2.0f;
 
         private float baseBuoyancy; // 기본적으로 떠받치는 힘
-        
+
 
 
 
         #region Unity Methods
 
+        private void Awake()
+        {
+            
+        }
 
         private void Start()
         {
@@ -48,6 +52,11 @@ namespace Babel
 
 
         #region Custom Methods
+
+        private void SetShipLevel()
+        {
+
+        }
 
         private void UpdateGravityBasedOnDepth()
         {

@@ -24,7 +24,7 @@ namespace Babel
         public TMP_Text resultLootValueText;
 
         public Block[] BallPrefabs;
-        public int maxIndexInQueue = 4;
+        private int maxIndexInQueue = TotalGameManager.Instance.CurrentStageLevel + 1;
 
         public Ship ship;
 
@@ -59,6 +59,8 @@ namespace Babel
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BallPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
+
+
         }
 
         private void Start()

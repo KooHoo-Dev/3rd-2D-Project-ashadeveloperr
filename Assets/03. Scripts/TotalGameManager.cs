@@ -11,12 +11,19 @@ namespace Babel
 
     public class TotalGameManager : SingletonBase<TotalGameManager>
     {
-        public int LootValue { get; private set; }
+        public int PlayerGold { get; private set; }
 
-        public void AddScore(int amount)
+        public int CurrntLevelShip { get; private set; } = 0;
+        public int CurrntLevelPump { get; private set; } = 0;
+        public int CurrntLevelTimer { get; private set; } = 0;
+        public int CurrntLevelInsurance { get; private set; } = 0;
+
+        public int CurrentStageLevel { get; private set; } = 0;
+
+
+        public void AddGold(int amount)
         {
-            LootValue += amount;
-            Debug.Log($"획득한 약탈물 : {LootValue}");
+            PlayerGold += amount;
         }
 
         protected override void OnInitialize()
