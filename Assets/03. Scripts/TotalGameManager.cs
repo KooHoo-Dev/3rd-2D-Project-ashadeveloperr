@@ -13,13 +13,20 @@ namespace Babel
     {
         public int PlayerGold { get; private set; }
 
-        public int CurrntLevelShip { get; private set; } = 0;
-        public int CurrntLevelPump { get; private set; } = 0;
-        public int CurrntLevelTimer { get; private set; } = 0;
-        public int CurrntLevelInsurance { get; private set; } = 0;
+        public int CurrentLevelShip { get; private set; } = 0;
+        public int CurrentLevelPump { get; private set; } = 0;
+        public int CurrentLevelTimer { get; private set; } = 0;
+        public int CurrentLevelInsurance { get; private set; } = 0;
+
+        public int MaintenanceCost { get; private set; }
 
         public int CurrentStageLevel { get; private set; } = 0;
 
+        public int TotalMaintenanceCost()
+        {
+            MaintenanceCost = (CurrentLevelPump * 100) + (CurrentLevelInsurance * 250);
+            return MaintenanceCost;
+        }
 
         public void AddGold(int amount)
         {
