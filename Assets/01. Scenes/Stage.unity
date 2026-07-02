@@ -1371,7 +1371,7 @@ MonoBehaviour:
   m_fontSizeMin: 10
   m_fontSizeMax: 1000
   m_fontStyle: 1
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -4393,7 +4393,7 @@ SpriteRenderer:
   m_SortingOrder: 3
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.10898005, g: 0.64347434, b: 0.745283, a: 0.7647059}
+  m_Color: {r: 0.10898005, g: 0.64347434, b: 0.745283, a: 0.79607844}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -5833,7 +5833,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4669811, g: 0.96871656, b: 1, a: 1}
+  m_Color: {r: 0.74509805, g: 0.9647613, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7439,8 +7439,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294770659
-  m_fontColor: {r: 0.8915094, g: 1, b: 0.98704994, a: 1}
+    rgba: 4293132279
+  m_fontColor: {r: 0.96819997, g: 1, b: 0.8901961, a: 1}
   m_enableVertexGradient: 1
   m_colorMode: 0
   m_fontColorGradient:
