@@ -60,7 +60,7 @@ namespace Babel
 
         protected override void Awake()
         {
-
+            int maxIndexInQueue = TotalGameManager.Instance.currentStageLevel;
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BlockPrefabs.Length);
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
