@@ -16,7 +16,7 @@ namespace Babel
         public ShipType currentShipType = (ShipType)2;
         public int CurrentLevelPump { get; private set; } = 0;
         public int CurrentLevelTimer { get; private set; } = 0;
-        public int CurrentLevelInsurance { get; private set; } = 2;
+        public int CurrentLevelInsurance { get; private set; } = 0;
 
         public int MaintenanceCost { get; private set; }
 
@@ -37,7 +37,7 @@ namespace Babel
 
         public int TotalMaintenanceCost()
         {
-            MaintenanceCost = (CurrentLevelPump * 50) + (CurrentLevelInsurance * 100) + GetShipMaintenanceCost(currentShipType);
+            MaintenanceCost = (CurrentLevelPump * 50) + (CurrentLevelInsurance * 50) + GetShipMaintenanceCost(currentShipType);
             return MaintenanceCost;
         }
 
@@ -50,9 +50,9 @@ namespace Babel
         {
             return type switch
             {
-                ShipType.Raft => 100,
-                ShipType.Canoe => 250,
-                ShipType.Cargo => 500,
+                ShipType.Raft => 0,
+                ShipType.Canoe => 50,
+                ShipType.Cargo => 100,
                 _ => 0
             };
         }

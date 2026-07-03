@@ -29,7 +29,7 @@ namespace Babel
         public TMP_Text resultClosingText;
 
         public Block[] BlockPrefabs;
-        private int maxIndexInQueue = 1;
+        public int maxIndexInQueue;
 
         public Ship ship;
         public GameObject ggScreen;
@@ -62,15 +62,15 @@ namespace Babel
 
         protected override void Awake()
         {
-            int maxIndexInQueue = TotalGameManager.Instance.currentStageLevel;
             maxIndexInQueue = Mathf.Min(maxIndexInQueue, BlockPrefabs.Length);
-            maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
+            maxIndexInQueue = Mathf.Max(TotalGameManager.Instance.currentStageLevel, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
 
         }
 
         private void Start()
         {
+
             OnLootChanged += UpdateLootValue;
             UpdateLootValue(InStageLootValue);
             RemainingTime = 10;
