@@ -37,7 +37,7 @@ namespace Babel
 
         public int TotalMaintenanceCost()
         {
-            MaintenanceCost = (CurrentLevelPump * 50) + (CurrentLevelInsurance * 50) + GetShipMaintenanceCost(currentShipType);
+            MaintenanceCost = (CurrentLevelTimer * 100) * (CurrentLevelPump * 50) + (CurrentLevelInsurance * 50) + GetShipMaintenanceCost(currentShipType);
             return MaintenanceCost;
         }
 
