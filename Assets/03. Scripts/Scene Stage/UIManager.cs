@@ -170,15 +170,15 @@ namespace Babel
             {
                 if (Vector2.Distance(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition) >= 0.1f)
                 {
-                    resultScreenRectTransform.anchoredPosition = Vector2.Lerp(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition, Time.deltaTime * 1.25f);
+                    resultScreenRectTransform.anchoredPosition = Vector2.Lerp(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition, Time.deltaTime * 3.5f);
                 }
                 if (Vector2.Distance(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition) >= 0.1f)
                 {
-                    inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.2f);
+                    inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.5f);
                 }
                 if (Vector2.Distance(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
                 {
-                    InteractUIRightRectTransform.anchoredPosition = Vector2.Lerp(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.2f);
+                    InteractUIRightRectTransform.anchoredPosition = Vector2.Lerp(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.5f);
                 }
             }
             else

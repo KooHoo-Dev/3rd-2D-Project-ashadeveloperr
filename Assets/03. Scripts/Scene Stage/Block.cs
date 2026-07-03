@@ -49,7 +49,7 @@ namespace Babel
         private void OnEnable()
         {
             float randomScale = Random.Range(0.8f, 1.2f);
-            transform.localScale = Vector3.one * randomScale;
+            transform.localScale *= randomScale;
 
             rb.mass = baseMass * randomScale;
         }
@@ -107,10 +107,7 @@ namespace Babel
             if (collision.CompareTag("Underwater") && HasLost == false)
             {
                 HasLost = true;
-                if (HasFirstContact)
-                {
-                    GameManager.Instance.LostLoot(blockValue);
-                }
+                GameManager.Instance.LostLoot(blockValue);
             }
         }
     }

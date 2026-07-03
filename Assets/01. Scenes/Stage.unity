@@ -4509,7 +4509,10 @@ MonoBehaviour:
   resultClosingText: {fileID: 71321212}
   BlockPrefabs:
   - {fileID: 7660311145588841664, guid: 0e095819adae50649ac74b1fa2a68f8c, type: 3}
+  - {fileID: 7660311145588841664, guid: 08a3fb447d5c6cd4b8b80bc6cc4823b5, type: 3}
   - {fileID: 7660311145588841664, guid: 958952251b5504243af5b91ebb392ce8, type: 3}
+  - {fileID: 7660311145588841664, guid: ee5ec92bf708a414f81929d196c5ab0f, type: 3}
+  maxIndexInQueue: 0
   ship: {fileID: 156850917}
   ggScreen: {fileID: 1894597054}
   sinkPoint: 0
