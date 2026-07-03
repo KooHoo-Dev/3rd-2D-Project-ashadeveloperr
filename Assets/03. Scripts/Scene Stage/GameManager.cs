@@ -22,6 +22,8 @@ namespace Babel
         public UIManager UIManager;
         public TMP_Text lootValueText;
         public TMP_Text resultLootValueText;
+        public TMP_Text resultCostText;
+        public TMP_Text resultClosingText;
 
         public Block[] BlockPrefabs;
         private int maxIndexInQueue = 1;
@@ -229,6 +231,10 @@ namespace Babel
             
             OnLootChanged?.Invoke(InStageLootValue);
             resultLootValueText.SetText($"{InStageLootValue}");
+            resultCostText.SetText($"{TotalGameManager.Instance.TotalMaintenanceCost()}");
+            resultClosingText.SetText($"{InStageLootValue - TotalGameManager.Instance.TotalMaintenanceCost()}");
+
+            TotalGameManager.Instance.AddGold(InStageLootValue - TotalGameManager.Instance.TotalMaintenanceCost());
 
             UIManager.ShowResultWindow();
             for (int i = 0; i < enableObjects.Length; ++i)
