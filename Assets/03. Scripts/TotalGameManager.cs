@@ -20,7 +20,7 @@ namespace Babel
 
         public int MaintenanceCost { get; private set; }
 
-        public int CurrentStageLevel { get; private set; } = 0;
+        public int currentStageLevel = 0;
 
 
 

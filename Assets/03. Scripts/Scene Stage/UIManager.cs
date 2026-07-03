@@ -19,6 +19,7 @@ namespace Babel
         public GameObject InteractUIRight;
         public GameObject pauseUIScreen;
         public TMP_Text NextStageText;
+        public TMP_Text ResultTitle;
 
         private Camera Cam { get; set; }
         private RectTransform resultScreenRectTransform;
@@ -140,13 +141,15 @@ namespace Babel
 
         public void ShowResultWindow()
         {
-            if (GameManager.Instance.isGameOver)
+            if (GameManager.Instance.isFailed)
             {
                 NextStageText.SetText("Retry");
+                ResultTitle.SetText("Fail...");
             }
             else
             {
                 NextStageText.SetText("Next");
+                ResultTitle.SetText("Success!");
             }
 
             RectTransform canvasRect = GetComponent<RectTransform>();

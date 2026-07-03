@@ -46,6 +46,11 @@ namespace Babel
             ApplyPointBuoyancy(leftBuoyancyPoint);
             ApplyPointBuoyancy(rightBuoyancyPoint);
             UpdateGravityBasedOnDepth();
+
+            if (GameManager.Instance.isGameOver && GameManager.Instance.isFailed == false)
+            {
+                rb.constraints = RigidbodyConstraints2D.FreezePositionY;
+            }
         }
 
         #endregion

@@ -30,6 +30,7 @@ namespace Babel
         public GameObject ggScreen;
         public float sinkPoint;
         public bool isGameOver;
+        public bool isFailed;
 
         private Queue<int> blockIndexQueue = new Queue<int>();
 
@@ -42,8 +43,6 @@ namespace Babel
         [SerializeField] private float stageTimeLimit = 60f;
         [SerializeField] private TMP_Text timerText;
         public float RemainingTime { get; private set; }
-        public bool isStageClear { get; private set; }
-        public bool IsStageEnded => isGameOver || isStageClear;
 
         #endregion
 
@@ -64,13 +63,13 @@ namespace Babel
             maxIndexInQueue = Mathf.Max(maxIndexInQueue, 0);
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
 
-
         }
 
         private void Start()
         {
             OnLootChanged += UpdateLootValue;
             UpdateLootValue(InStageLootValue);
+            RemainingTime = 20;
         }
 
         private void FixedUpdate()
@@ -80,14 +79,27 @@ namespace Babel
 
         private void Update()
         {
-            if (isGameOver)
+            if (isGameOver && isFailed)
             {
                 GameOverEffect();
             }
-            else
+
+            UpdateGauge();
+
+            if (RemainingTime > 0)
             {
-                UpdateGauge();
+                RemainingTime -= Time.deltaTime;
+
+                if (RemainingTime < 0)
+                {
+                    RemainingTime = 0;
+                    isGameOver = true;
+                    GameOver();
+                }
+
+                UpdateTimerDisplay();
             }
+
         }
 
         #endregion
@@ -96,17 +108,24 @@ namespace Babel
 
         #region Custom Methods;
 
+        private void UpdateTimerDisplay()
+        {
+            int totalSeconds = Mathf.CeilToInt(RemainingTime);
+            int minutes = totalSeconds / 60;
+            int seconds = totalSeconds % 60;
+
+            timerText.text = $"{minutes:D2}:{seconds:D2}";
+        }
+
 
         private void UpdateLootValue(int targetLoot)
         {
-            // 기존에 실행 중인 연출이 있다면 멈추고 새로 시작합니다 [4]
             if (countCoroutine != null) StopCoroutine(countCoroutine);
             countCoroutine = StartCoroutine(CountLootRoutine(targetLoot));
         }
 
         private IEnumerator CountLootRoutine(int targetLoot)
         {
-            // 표시된 점수가 목표 점수와 같아질 때까지 반복합니다
             while (currentDisplayedLoot != targetLoot)
             {
                 if (currentDisplayedLoot < targetLoot)
@@ -114,10 +133,8 @@ namespace Babel
                 else
                     currentDisplayedLoot--;
 
-                // 텍스트 갱신
                 lootValueText.SetText($"{currentDisplayedLoot}");
 
-                // 한 프레임 대기하거나 특정 시간을 기다립니다 [3, 4]
                 yield return new WaitForSeconds(0.003f);
             }
             countCoroutine = null;
@@ -155,7 +172,6 @@ namespace Babel
                     if (sinkPoint > 0)
                     {
                         sinkPoint -= pumpPower * Time.deltaTime;
-                        //Debug.LogWarning($"물 퍼내는 중... 현재 {sinkPoint}%");
                     }
                     else sinkPoint = 0;
 
@@ -165,20 +181,19 @@ namespace Babel
                     if (sinkPoint < 100)
                     {
                         sinkPoint += Mathf.Abs(deck.position.y) * Time.deltaTime * 10f - (pumpPower / 100);
-                        //Debug.LogWarning($"도움! {deck} 위치에서 침수중... 현재 {sinkPoint}%");
                     }
                     else
                     {
                         isGameOver = true;
+                        isFailed = true;
                         GameOver();
                     }
                 }
             }
         }
 
-        void UpdateGauge()
+        private void UpdateGauge()
         {
-            // Fill Amount는 0.0 ~ 1.0 사이의 값이여야 하므로 [현재값 / 최대값]으로 계산합니다.
             gaugeFillImage.fillAmount = sinkPoint / 100;
         }
 
@@ -203,7 +218,15 @@ namespace Babel
 
         public void GameOver()
         {
-            InStageLootValue = 0;
+            if (isFailed)
+            {
+                InStageLootValue = 0;
+            }
+            else
+            {
+                TotalGameManager.Instance.currentStageLevel++;
+            }
+            
             OnLootChanged?.Invoke(InStageLootValue);
             resultLootValueText.SetText($"{InStageLootValue}");
 
