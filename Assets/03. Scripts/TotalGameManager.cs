@@ -11,12 +11,12 @@ namespace Babel
 
     public class TotalGameManager : SingletonBase<TotalGameManager>
     {
-        public int PlayerGold { get; private set; } = 1000;
+        public int PlayerGold { get; private set; }
 
         public ShipType currentShipType = (ShipType)2;
-        public int CurrentLevelPump { get; private set; } = 0;
-        public int CurrentLevelTimer { get; private set; } = 0;
-        public int CurrentLevelInsurance { get; private set; } = 0;
+        public int CurrentLevelPump { get; set; } = 0;
+        public int CurrentLevelTimer { get; set; } = 0;
+        public int CurrentLevelInsurance { get; set; } = 0;
 
         public int MaintenanceCost { get; private set; }
 

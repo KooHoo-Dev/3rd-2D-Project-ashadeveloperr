@@ -51,7 +51,7 @@ namespace Babel
         #endregion
 
         #region User Var;
-        private float pumpPower = 1.5f;
+        private float pumpPower;
 
         public int InStageLootValue { get; private set; }
 
@@ -70,10 +70,11 @@ namespace Babel
 
         private void Start()
         {
-
             OnLootChanged += UpdateLootValue;
             UpdateLootValue(InStageLootValue);
-            RemainingTime = 10;
+
+            pumpPower = 1.5f * (TotalGameManager.Instance.CurrentLevelPump * 1.0f);
+            RemainingTime = 20 + (TotalGameManager.Instance.CurrentLevelTimer * 3) ;
         }
 
         private void FixedUpdate()
