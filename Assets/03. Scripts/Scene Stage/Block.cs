@@ -17,10 +17,11 @@ namespace Babel
         private bool isFired = false;          // 발사 여부 체크
 
         private bool isUnderWater;
-        private int blockValue = 100;
+        public int blockValue = 100;
 
         private Rigidbody2D rb;
         private Collider2D col;
+
 
 
         private void Awake()

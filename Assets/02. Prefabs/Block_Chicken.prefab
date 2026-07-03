@@ -368,3 +368,4 @@ MonoBehaviour:
   level: 1
   minRotationSpeed: 5
   maxRotationSpeed: 30
+  blockValue: 250
