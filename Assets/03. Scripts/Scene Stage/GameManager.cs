@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+using static Babel.TotalGameManager;
 using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
@@ -21,6 +22,8 @@ namespace Babel
         public Image gaugeFillImage;
         public UIManager UIManager;
         public TMP_Text lootValueText;
+        public TMP_Text insuranceTitleText;
+        public TMP_Text insuranceValueText;
         public TMP_Text resultLootValueText;
         public TMP_Text resultCostText;
         public TMP_Text resultClosingText;
@@ -42,7 +45,6 @@ namespace Babel
 
         [Header("게임 오버 타이머")]
 
-        [SerializeField] private float stageTimeLimit = 60f;
         [SerializeField] private TMP_Text timerText;
         public float RemainingTime { get; private set; }
 
@@ -71,7 +73,7 @@ namespace Babel
         {
             OnLootChanged += UpdateLootValue;
             UpdateLootValue(InStageLootValue);
-            RemainingTime = 20;
+            RemainingTime = 10;
         }
 
         private void FixedUpdate()
@@ -223,20 +225,42 @@ namespace Babel
             if (isFailed)
             {
                 InStageLootValue = 0;
-            }
-            else
-            {
-                TotalGameManager.Instance.currentStageLevel++;
+                TotalGameManager.Instance.currentShipType -= (ShipType)1;
             }
             
             OnLootChanged?.Invoke(InStageLootValue);
-            resultLootValueText.SetText($"{InStageLootValue}");
-            resultCostText.SetText($"{TotalGameManager.Instance.TotalMaintenanceCost()}");
-            resultClosingText.SetText($"{InStageLootValue - TotalGameManager.Instance.TotalMaintenanceCost()}");
+            resultLootValueText.SetText($"+{InStageLootValue}");
+            resultCostText.SetText($"-{TotalGameManager.Instance.TotalMaintenanceCost()}");
 
-            TotalGameManager.Instance.AddGold(InStageLootValue - TotalGameManager.Instance.TotalMaintenanceCost());
+            int baseClosing = InStageLootValue - TotalGameManager.Instance.TotalMaintenanceCost();
+            if (baseClosing > 0) TotalGameManager.Instance.currentStageLevel++;
 
-            UIManager.ShowResultWindow();
+            insuranceTitleText.gameObject.SetActive(false);
+            insuranceValueText.gameObject.SetActive(false);
+
+            int totalClosing;
+            if (baseClosing < 0 && TotalGameManager.Instance.CurrentLevelInsurance > 0)
+            {
+                insuranceTitleText.gameObject.SetActive(true);
+                insuranceValueText.gameObject.SetActive(true);
+                int divisor = TotalGameManager.Instance.CurrentLevelInsurance + 1;
+
+                totalClosing = baseClosing / divisor;
+
+                int savedAmount = Mathf.Abs(baseClosing - totalClosing);
+                insuranceValueText.SetText($"+{savedAmount}");
+            }
+            else
+            {
+                totalClosing = baseClosing;
+                insuranceValueText.SetText("0");
+            }
+
+            TotalGameManager.Instance.AddGold(totalClosing);
+
+            resultClosingText.SetText($"{totalClosing}");
+
+            UIManager.ShowResultWindow(totalClosing);
             for (int i = 0; i < enableObjects.Length; ++i)
             {
                 enableObjects[i].SetActive(true);
@@ -245,6 +269,8 @@ namespace Babel
             {
                 disableObjects[i].SetActive(false);
             }
+
+
         }
 
         private void GameOverEffect()

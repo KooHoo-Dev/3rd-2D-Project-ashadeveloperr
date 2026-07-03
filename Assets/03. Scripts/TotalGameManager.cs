@@ -13,10 +13,10 @@ namespace Babel
     {
         public int PlayerGold { get; private set; } = 1000;
 
-        [SerializeField] private ShipType currentShipType = ShipType.Cargo;
+        public ShipType currentShipType = (ShipType)2;
         public int CurrentLevelPump { get; private set; } = 0;
         public int CurrentLevelTimer { get; private set; } = 0;
-        public int CurrentLevelInsurance { get; private set; } = 0;
+        public int CurrentLevelInsurance { get; private set; } = 2;
 
         public int MaintenanceCost { get; private set; }
 
@@ -37,7 +37,7 @@ namespace Babel
 
         public int TotalMaintenanceCost()
         {
-            MaintenanceCost = (CurrentLevelPump * 100) + (CurrentLevelInsurance * 250) + GetShipMaintenanceCost(currentShipType);
+            MaintenanceCost = (CurrentLevelPump * 50) + (CurrentLevelInsurance * 100) + GetShipMaintenanceCost(currentShipType);
             return MaintenanceCost;
         }
 

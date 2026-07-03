@@ -139,17 +139,19 @@ namespace Babel
             Cam.transform.position = lerpPos;
         }
 
-        public void ShowResultWindow()
+        public void ShowResultWindow(int totalClosing)
         {
             if (GameManager.Instance.isFailed)
             {
                 NextStageText.SetText("Retry");
-                ResultTitle.SetText("Fail...");
+                ResultTitle.SetText("Arrrgh! We lost the ship!");
             }
             else
             {
                 NextStageText.SetText("Next");
-                ResultTitle.SetText("Success!");
+                if (totalClosing <= 0) ResultTitle.SetText("At least, She’s still afloat!");
+                else ResultTitle.SetText("Aye! Look at all this booty!");
+
             }
 
             RectTransform canvasRect = GetComponent<RectTransform>();
