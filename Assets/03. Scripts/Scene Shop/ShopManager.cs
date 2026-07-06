@@ -9,6 +9,7 @@ namespace Babel
     public class ShopManager : MonoBehaviour
     {
         public TMP_Text userGoldText;
+        public TMP_Text shipNameText;
         public TMP_Text shipPriceText;
         public TMP_Text pumpPriceText;
         public TMP_Text timerPriceText;
@@ -16,13 +17,22 @@ namespace Babel
         public TMP_Text pumpLevelText;
         public TMP_Text timerLevelText;
         public TMP_Text insuranceLevelText;
+        public TMP_Text shipSpecText;
+        public TMP_Text shipMaintenanceText;
+        public TMP_Text totalMaintenanceText;
+
+        public Button shipButton;
 
         public Image notEnoughGold;
 
-        private int shipPrice = 200;
-        private int pumpPrice = 200;
-        private int timerPrice = 200;
-        private int insurancePrice = 200;
+        public Image canoeImage;
+        public Image boatImage;
+        public Image cargoImage;
+
+        private int shipPrice;
+        private int pumpPrice;
+        private int timerPrice;
+        private int insurancePrice;
 
         private Coroutine countCoroutine;
         private int currentDisplayedLoot = 0;
@@ -30,14 +40,12 @@ namespace Babel
         private void Start()
         {
             OnLootChanged += UpdateLootValue;
-            currentDisplayedLoot = TotalGameManager.Instance.PlayerGold;
-            userGoldText.SetText($"{TotalGameManager.Instance.PlayerGold}");
-
-            refreshUIandPrice();
         }
 
-        private void Update()
+        private void OnEnable()
         {
+            UpdateLootValue(TotalGameManager.Instance.PlayerGold);
+            refreshUIandPrice();
         }
 
         private void OnDestroy()
@@ -45,10 +53,12 @@ namespace Babel
             OnLootChanged -= UpdateLootValue;
         }
 
+
+
+
         private void refreshUIandPrice()
         {
-
-            shipPriceText.SetText($"{1000}");
+            RefreshShipUI();
 
             pumpPrice = 300 + (TotalGameManager.Instance.CurrentLevelPump * 300);
             pumpPriceText.SetText($"{300 + (TotalGameManager.Instance.CurrentLevelPump * 300)}");
@@ -61,13 +71,206 @@ namespace Babel
             insurancePrice = 200 + (TotalGameManager.Instance.CurrentLevelInsurance * 200);
             insurancePriceText.SetText($"{200 + (TotalGameManager.Instance.CurrentLevelInsurance * 200)}");
             insuranceLevelText.SetText($"Lv.{TotalGameManager.Instance.CurrentLevelInsurance}");
+
+            RefreshTotalMaintenanceUI();
+        }
+
+        private void RefreshTotalMaintenanceUI()
+        {
+            if (totalMaintenanceText == null)
+            {
+                return;
+            }
+
+            int totalMaintenanceCost = TotalGameManager.Instance.TotalMaintenanceCost();
+            totalMaintenanceText.SetText($"{totalMaintenanceCost}");
         }
 
 
         public void ShipUpgrade()
         {
-            
+            TotalGameManager manager = TotalGameManager.Instance;
+
+            if (!TryGetNextShipType(manager.currentShipType, out TotalGameManager.ShipType nextShipType))
+            {
+                refreshUIandPrice();
+                return;
+            }
+
+            shipPrice = GetShipUpgradePrice(manager.currentShipType);
+
+            if (manager.PlayerGold < shipPrice)
+            {
+                Debug.Log("골드가 부족합니다.");
+                return;
+            }
+
+            manager.AddGold(-shipPrice);
+            manager.currentShipType = nextShipType;
+
+            OnLootChanged?.Invoke(manager.PlayerGold);
+            refreshUIandPrice();
         }
+
+
+        private void RefreshShipUI()
+        {
+            TotalGameManager manager = TotalGameManager.Instance;
+            TotalGameManager.ShipType currentShipType = manager.currentShipType;
+
+            if (!TryGetNextShipType(currentShipType, out TotalGameManager.ShipType nextShipType))
+            {
+                shipPrice = 0;
+
+                SetShopShipImage(null);
+
+                if (shipNameText != null)
+                {
+                    shipNameText.SetText("Max Level");
+                }
+
+                if (shipPriceText != null)
+                {
+                    shipPriceText.SetText("-");
+                }
+
+                if (shipMaintenanceText != null)
+                {
+                    shipMaintenanceText.SetText("Maintenance : -");
+                }
+
+                if (shipSpecText != null)
+                {
+                    shipSpecText.SetText(
+                        $"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\n" +
+                        $"No more ships available."
+                    );
+                }
+
+                if (shipButton != null)
+                {
+                    shipButton.interactable = false;
+                }
+
+                return;
+            }
+
+            shipPrice = GetShipUpgradePrice(currentShipType);
+
+            int currentShipMaintenanceCost = manager.GetShipMaintenanceCost(currentShipType);
+            int nextShipMaintenanceCost = manager.GetShipMaintenanceCost(nextShipType);
+
+            SetShopShipImage(nextShipType);
+
+            if (shipNameText != null)
+            {
+                shipNameText.SetText(GetShipDisplayName(nextShipType));
+            }
+
+            if (shipPriceText != null)
+            {
+                shipPriceText.SetText($"{shipPrice}");
+            }
+
+            if (shipMaintenanceText != null)
+            {
+                shipMaintenanceText.SetText(
+                    $"Current Maintenance : {currentShipMaintenanceCost}\n" +
+                    $"Next Maintenance : {nextShipMaintenanceCost}"
+                );
+            }
+
+            if (shipSpecText != null)
+            {
+                shipSpecText.SetText(
+                    $"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\n" +
+                    $"This {GetShipDisplayName(nextShipType)}'s displacement : {GetShipMass(nextShipType)}kg"
+                );
+            }
+
+            if (shipButton != null)
+            {
+                shipButton.interactable = true;
+            }
+        }
+
+        private void SetShopShipImage(TotalGameManager.ShipType? nextShipType)
+        {
+            if (canoeImage != null)
+            {
+                canoeImage.gameObject.SetActive(nextShipType == TotalGameManager.ShipType.Canoe);
+            }
+
+            if (boatImage != null)
+            {
+                boatImage.gameObject.SetActive(nextShipType == TotalGameManager.ShipType.Boat);
+            }
+
+            if (cargoImage != null)
+            {
+                cargoImage.gameObject.SetActive(nextShipType == TotalGameManager.ShipType.Cargo);
+            }
+        }
+
+
+        private int GetShipUpgradePrice(TotalGameManager.ShipType currentShipType)
+        {
+            return currentShipType switch
+            {
+                TotalGameManager.ShipType.Raft => 1000,
+                TotalGameManager.ShipType.Canoe => 3000,
+                TotalGameManager.ShipType.Boat => 5000,
+                _ => 0
+            };
+        }
+
+        private string GetShipDisplayName(TotalGameManager.ShipType shipType)
+        {
+            return shipType switch
+            {
+                TotalGameManager.ShipType.Raft => "Raft",
+                TotalGameManager.ShipType.Canoe => "Canoe",
+                TotalGameManager.ShipType.Boat => "Boat",
+                TotalGameManager.ShipType.Cargo => "Cargo",
+                _ => "Unknown Ship"
+            };
+        }
+
+        private int GetShipMass(TotalGameManager.ShipType shipType)
+        {
+            return shipType switch
+            {
+                TotalGameManager.ShipType.Raft => 150,
+                TotalGameManager.ShipType.Canoe => 200,
+                TotalGameManager.ShipType.Boat => 250,
+                TotalGameManager.ShipType.Cargo => 300,
+                _ => 0
+            };
+        }
+
+        private bool TryGetNextShipType(TotalGameManager.ShipType currentShipType, out TotalGameManager.ShipType nextShipType)
+        {
+            switch (currentShipType)
+            {
+                case TotalGameManager.ShipType.Raft:
+                    nextShipType = TotalGameManager.ShipType.Canoe;
+                    return true;
+
+                case TotalGameManager.ShipType.Canoe:
+                    nextShipType = TotalGameManager.ShipType.Boat;
+                    return true;
+
+                case TotalGameManager.ShipType.Boat:
+                    nextShipType = TotalGameManager.ShipType.Cargo;
+                    return true;
+
+                default:
+                    nextShipType = currentShipType;
+                    return false;
+            }
+        }
+
+
         public void PumpUpgrade()
         {
             if(TotalGameManager.Instance.PlayerGold >= pumpPrice)
@@ -79,15 +282,38 @@ namespace Babel
             }
             else
             {
+                Debug.Log("골드가 부족합니다.");
             }
         }
         public void TimerUpgrade()
         {
+            if (TotalGameManager.Instance.PlayerGold >= timerPrice)
+            {
+                TotalGameManager.Instance.CurrentLevelTimer++;
+                TotalGameManager.Instance.AddGold(-timerPrice);
 
+                OnLootChanged?.Invoke(TotalGameManager.Instance.PlayerGold);
+                refreshUIandPrice();
+            }
+            else
+            {
+                Debug.Log("골드가 부족합니다.");
+            }
         }
         public void InsuranceUpgrade()
         {
+            if (TotalGameManager.Instance.PlayerGold >= insurancePrice)
+            {
+                TotalGameManager.Instance.CurrentLevelInsurance++;
+                TotalGameManager.Instance.AddGold(-insurancePrice);
 
+                OnLootChanged?.Invoke(TotalGameManager.Instance.PlayerGold);
+                refreshUIandPrice();
+            }
+            else
+            {
+                Debug.Log("골드가 부족합니다.");
+            }
         }
 
 
@@ -116,6 +342,8 @@ namespace Babel
             userGoldText.SetText($"{currentDisplayedLoot}");
             countCoroutine = null;
         }
+
+
 
         public event System.Action<int> OnLootChanged;
     }

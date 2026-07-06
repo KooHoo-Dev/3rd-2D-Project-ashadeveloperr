@@ -1,62 +1,204 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 namespace Babel
 {
-
     public class MainMenuUIManager : MonoBehaviour
     {
-        private RectTransform rectTransform;
-        private Canvas parentCanvas;
+        [Header("UI Refs")]
+        public RectTransform titleText;
+        public RectTransform root;
 
-        private float lerpSpeed = 2.0f;
-        private Vector2 targetPosition;
-        private bool isMoving = false;
-
+        [Header("Camera Refs")]
         public Transform cameraTargetPivot;
+
+        [Header("UI Move Settings")]
+        public float titleMoveSpeed = 2.0f;
+        public float rootMoveSpeed = 2.0f;
+        public float titleStartDelay = 0.1f;
+        public float rootStartDelay = 0.25f;
+
+        [Header("Camera Move Settings")]
+        public Vector3 cameraStartOffset = new Vector3(0, 8, 0);
+        public Vector3 cameraTargetOffset = Vector3.zero;
+        public float cameraMoveSpeed = 1.2f;
+
+        [Header("Camera Floating Settings")]
+        public float floatingAmount = 0.25f;
+        public float floatingSpeed = 0.6f;
+        public float floatingFollowSpeed = 1.2f;
+
+        private Camera cam;
+        private RectTransform canvasRectTransform;
+
+        private Vector2 titleRootPosition;
+        private Vector2 rootRootPosition;
+
+        private float introTimer;
+        private float floatingTimer;
+        private float cameraZ;
+
+        private bool cameraIntroFinished = false;
 
         private void Awake()
         {
-            rectTransform = GetComponent<RectTransform>();
-            parentCanvas = GetComponentInParent<Canvas>();
+            Time.timeScale = 1.0f;
+
+            cam = Camera.main;
+            canvasRectTransform = GetComponent<RectTransform>();
+
+            cameraZ = cam.transform.position.z;
+
+            if (titleText == null)
+            {
+                Transform titleTransform = transform.Find("TitleText");
+                if (titleTransform != null)
+                {
+                    titleText = titleTransform.GetComponent<RectTransform>();
+                }
+            }
+
+            if (root == null)
+            {
+                Transform rootTransform = transform.Find("Root");
+                if (rootTransform != null)
+                {
+                    root = rootTransform.GetComponent<RectTransform>();
+                }
+            }
         }
 
         private void Start()
         {
-            MoveToTarget();
+            SetStartPositions();
         }
+
         private void Update()
         {
-            CameraMoving();
+            introTimer += Time.deltaTime;
+
+            MoveTitleText();
+            MoveRoot();
+            CameraWork();
         }
 
-
-        public void MoveToTarget()
+        private void SetStartPositions()
         {
-            targetPosition = Vector2.zero;
-            isMoving = true;
-        }
+            float screenHeight = canvasRectTransform.rect.height;
+            float screenWidth = canvasRectTransform.rect.width;
 
-        private void CameraMoving()
-        {
-            if (isMoving)
+            if (titleText != null)
             {
-                if (Vector2.Distance(rectTransform.anchoredPosition, targetPosition) >= 0.1f)
+                titleRootPosition = titleText.anchoredPosition;
+
+                titleText.anchoredPosition =
+                    titleRootPosition + new Vector2(0, screenHeight + titleText.rect.height);
+            }
+
+            if (root != null)
+            {
+                rootRootPosition = root.anchoredPosition;
+
+                root.anchoredPosition =
+                    rootRootPosition + new Vector2(screenWidth + root.rect.width, 0);
+            }
+
+            if (cam != null)
+            {
+                Vector3 targetPos = GetCameraBasePosition();
+
+                cam.transform.position = targetPos + cameraStartOffset;
+            }
+        }
+
+        private void MoveTitleText()
+        {
+            if (titleText == null) return;
+            if (introTimer < titleStartDelay) return;
+
+            if (Vector2.Distance(titleText.anchoredPosition, titleRootPosition) >= 0.1f)
+            {
+                titleText.anchoredPosition = Vector2.Lerp(
+                    titleText.anchoredPosition,
+                    titleRootPosition,
+                    Time.deltaTime * titleMoveSpeed
+                );
+            }
+        }
+
+        private void MoveRoot()
+        {
+            if (root == null) return;
+            if (introTimer < rootStartDelay) return;
+
+            if (Vector2.Distance(root.anchoredPosition, rootRootPosition) >= 0.1f)
+            {
+                root.anchoredPosition = Vector2.Lerp(
+                    root.anchoredPosition,
+                    rootRootPosition,
+                    Time.deltaTime * rootMoveSpeed
+                );
+            }
+        }
+
+        private void CameraWork()
+        {
+            if (cam == null) return;
+
+            Vector3 baseTargetPos = GetCameraBasePosition();
+            Vector3 targetPos = baseTargetPos;
+
+            if (cameraIntroFinished == false)
+            {
+                if (Vector2.Distance(cam.transform.position, baseTargetPos) <= 0.1f)
                 {
-                    rectTransform.anchoredPosition = Vector2.Lerp(rectTransform.anchoredPosition, targetPosition, Time.deltaTime * lerpSpeed);
+                    cameraIntroFinished = true;
                 }
             }
             else
             {
-                RectTransform canvasRect = parentCanvas.GetComponent<RectTransform>();
-                float screenHeight = canvasRect.rect.height;
+                floatingTimer += Time.deltaTime;
+                float floatingY = Mathf.Sin(floatingTimer * floatingSpeed) * floatingAmount;
 
-                rectTransform.anchoredPosition = new Vector2(0, -screenHeight);
-
-                targetPosition = rectTransform.anchoredPosition;
+                targetPos.y += floatingY;
             }
+
+            float speed = cameraIntroFinished ? floatingFollowSpeed : cameraMoveSpeed;
+
+            Vector3 lerpPos = Vector3.Lerp(
+                cam.transform.position,
+                targetPos,
+                Time.deltaTime * speed
+            );
+
+            lerpPos.z = cameraZ;
+            cam.transform.position = lerpPos;
         }
 
-        
+        private Vector3 GetCameraBasePosition()
+        {
+            Vector3 targetPos;
+
+            if (cameraTargetPivot != null)
+            {
+                targetPos = cameraTargetPivot.position + cameraTargetOffset;
+            }
+            else
+            {
+                targetPos = cam.transform.position;
+            }
+
+            targetPos.z = cameraZ;
+            return targetPos;
+        }
+
+        public void ExitGame()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+    Application.Quit();
+#endif
+        }
+
     }
 }

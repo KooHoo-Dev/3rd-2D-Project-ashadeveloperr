@@ -312,6 +312,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TotalGameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6679342216759793976, guid: 7aea9f2367d60b2498b6cc5458fd64b0, type: 3}
+      propertyPath: currentShipType
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6748163475188218628, guid: 7aea9f2367d60b2498b6cc5458fd64b0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.026925445

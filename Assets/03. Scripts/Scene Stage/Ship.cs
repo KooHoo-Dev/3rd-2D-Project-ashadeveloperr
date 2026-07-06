@@ -35,8 +35,6 @@ namespace Babel
         private void Start()
         {
             rb = GetComponent<Rigidbody2D>();
-
-            rb.mass = transform.localScale.x * transform.localScale.y * 10.0f;
             rb.gravityScale = rb.mass / 5000;
             baseBuoyancy = rb.mass * 0.55f;
         }
@@ -58,10 +56,6 @@ namespace Babel
 
         #region Custom Methods
 
-        private void SetShipLevel()
-        {
-
-        }
 
         private void UpdateGravityBasedOnDepth()
         {

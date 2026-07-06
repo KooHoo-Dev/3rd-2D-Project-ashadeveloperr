@@ -11,9 +11,13 @@ namespace Babel
 
     public class TotalGameManager : SingletonBase<TotalGameManager>
     {
-        public int PlayerGold { get; private set; }
+        [SerializeField] private string bankruptcySceneName = "BankruptcyEnding";
 
-        public ShipType currentShipType = (ShipType)2;
+        public bool HasSeenStageTutorialSplash { get; private set; } = false;
+
+        public int PlayerGold { get; private set; } = 10000;
+
+        public ShipType currentShipType = ShipType.Raft;
         public int CurrentLevelPump { get; set; } = 0;
         public int CurrentLevelTimer { get; set; } = 0;
         public int CurrentLevelInsurance { get; set; } = 0;
@@ -21,11 +25,18 @@ namespace Babel
         public int MaintenanceCost { get; private set; }
 
         public int currentStageLevel = 0;
+        public bool IsBankrupt { get; private set; }
+
+        public void MarkStageTutorialSplashSeen()
+        {
+            HasSeenStageTutorialSplash = true;
+        }
 
         public enum ShipType
         {
             Raft,
             Canoe,
+            Boat,
             Cargo,
         }
 
@@ -37,13 +48,49 @@ namespace Babel
 
         public int TotalMaintenanceCost()
         {
-            MaintenanceCost = (CurrentLevelTimer * 100) * (CurrentLevelPump * 50) + (CurrentLevelInsurance * 50) + GetShipMaintenanceCost(currentShipType);
+            MaintenanceCost = (CurrentLevelTimer * 50) + (CurrentLevelPump * 30) + (CurrentLevelInsurance * 20) + GetShipMaintenanceCost(currentShipType);
             return MaintenanceCost;
         }
 
-        public void AddGold(int amount)
+        public bool AddGold(int amount)
         {
             PlayerGold += amount;
+
+            if (PlayerGold < 0 && amount < 0)
+            {
+                GoToBankruptcyEnding();
+                return false;
+            }
+
+            return true;
+        }
+
+        private void GoToBankruptcyEnding()
+        {
+            if (IsBankrupt)
+            {
+                return;
+            }
+
+            IsBankrupt = true;
+            SceneManager.LoadScene(bankruptcySceneName);
+        }
+
+        public void ResetAllForNewGame()
+        {
+            PlayerGold = 0;
+
+            currentShipType = ShipType.Raft;
+
+            currentStageLevel = 0;
+
+            CurrentLevelPump = 0;
+            CurrentLevelTimer = 0;
+            CurrentLevelInsurance = 0;
+
+            MaintenanceCost = 0;
+
+            IsBankrupt = false;
         }
 
         public int GetShipMaintenanceCost(ShipType type)
@@ -51,19 +98,32 @@ namespace Babel
             return type switch
             {
                 ShipType.Raft => 0,
-                ShipType.Canoe => 50,
-                ShipType.Cargo => 100,
+                ShipType.Canoe => 200,
+                ShipType.Boat => 400,
+                ShipType.Cargo => 600,
                 _ => 0
             };
         }
 
+        public void ResetProgressAfterShipwreck()
+        {
+            currentShipType = ShipType.Raft;
 
+            currentStageLevel = 0;
 
+            CurrentLevelPump = 0;
+            CurrentLevelTimer = 0;
+            CurrentLevelInsurance = 0;
 
+            MaintenanceCost = 0;
+        }
 
-
-
-
+        public void UpgradeShip()
+        {
+            int current = (int)currentShipType;
+            current = Mathf.Min(current + 1, (int)ShipType.Cargo);
+            currentShipType = (ShipType)current;
+        }
 
     }
 

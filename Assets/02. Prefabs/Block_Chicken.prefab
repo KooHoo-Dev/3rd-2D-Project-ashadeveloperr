@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4094614016546211967}
   - component: {fileID: 5705960148868863402}
   - component: {fileID: 3516985219363598458}
-  - component: {fileID: 7660311145588841664}
+  - component: {fileID: 2322143420779979465}
   m_Layer: 0
   m_Name: Block_Chicken
   m_TagString: Untagged
@@ -353,7 +353,7 @@ PolygonCollider2D:
       - {x: 0.36499998, y: -2.45}
       - {x: 0.405, y: -2.3899999}
   m_UseDelaunayMesh: 1
---- !u!114 &7660311145588841664
+--- !u!114 &2322143420779979465
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -362,10 +362,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7923023404023840451}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9979c27fe6e673b408e67f0f575ba00d, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b113771602a8a64783e62b6b102ecf3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Babel.Block
+  m_EditorClassIdentifier: Assembly-CSharp::Babel.ChickenBlock
   level: 1
   minRotationSpeed: 5
   maxRotationSpeed: 30
+  windPower: 0.35
   blockValue: 250
+  friedSprite: {fileID: 0}
+  friedPhysicsMaterial: {fileID: 0}
+  friedColor: {r: 0.9685534, g: 0.9205721, b: 0.7705786, a: 1}

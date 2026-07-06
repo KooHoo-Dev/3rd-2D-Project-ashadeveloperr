@@ -8,36 +8,43 @@ namespace Babel
         public bool HasFirstContact { get; private set; } = false;
         public bool HasLost { get; private set; } = false;
 
-        private float baseMass;
+        protected float baseMass;
 
         [Header("Rotation Settings")]
-        public float minRotationSpeed = 5f; // 최소 회전 속도
-        public float maxRotationSpeed = 30f; // 최대 회전 속도
-        private float assignedAngularVelocity; // 이 블록에 부여된 랜덤 회전 속도
-        private bool isFired = false;          // 발사 여부 체크
+        public float minRotationSpeed = 5f;
+        public float maxRotationSpeed = 30f;
+        protected float assignedAngularVelocity;
+        protected bool isFired = false;
 
-        private bool isUnderWater;
+        [Header("Wind Settings")]
+        [SerializeField] protected float windPower = 0.35f;
+        public float WindPower => windPower;
+
+        protected float assignedWindSpeed;
+
+        protected bool isUnderWater;
         public int blockValue = 100;
 
-        private Rigidbody2D rb;
-        private Collider2D col;
+        protected Rigidbody2D rb;
+        protected Collider2D col;
 
-
-
-        private void Awake()
+        protected virtual void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
+
             col.enabled = false;
             rb.gravityScale = 0.0f;
             rb.bodyType = RigidbodyType2D.Kinematic;
+
             baseMass = rb.mass;
+
             float randomSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
             float randomDirection = Random.Range(-1, 1) >= 0 ? 1f : -1f;
             assignedAngularVelocity = randomSpeed * randomDirection;
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             IsUnderWater();
 
@@ -47,18 +54,31 @@ namespace Babel
             }
         }
 
-        private void OnEnable()
+        protected virtual void FixedUpdate()
+        {
+            ApplyWind();
+        }
+
+        protected virtual void OnEnable()
         {
             float randomScale = Random.Range(0.8f, 1.2f);
             transform.localScale *= randomScale;
 
-            rb.mass = baseMass * randomScale;
+            if (rb != null)
+            {
+                rb.mass = baseMass * randomScale;
+            }
         }
 
-        // ⭐ [수정] PlayerController가 호출하던 Launch 함수에 물리 회전 추가
-        public void Launch(Vector2 force)
+        public virtual void Launch(Vector2 force)
         {
-            isFired = true; // 대기 상태 회전 루틴 해제
+            Launch(force, 0.0f);
+        }
+
+        public virtual void Launch(Vector2 force, float windSpeed)
+        {
+            isFired = true;
+            assignedWindSpeed = windSpeed;
 
             col.enabled = true;
             rb.bodyType = RigidbodyType2D.Dynamic;
@@ -66,21 +86,30 @@ namespace Babel
 
             transform.SetParent(null);
 
-            // 물리 힘(Impulse) 적용
             rb.AddForce(force, ForceMode2D.Impulse);
-
-            // ⭐ [추가] 대기할 때 돌던 속도 그대로 물리 회전 속도(angularVelocity)로 이어받음
             rb.angularVelocity = assignedAngularVelocity;
         }
 
-        private void IsUnderWater()
+        protected virtual void ApplyWind()
+        {
+            if (isFired == false) return;
+            if (rb.bodyType != RigidbodyType2D.Dynamic) return;
+            if (HasFirstContact) return;
+            if (HasLost) return;
+            if (isUnderWater) return;
+
+            Vector2 windForce = Vector2.right * assignedWindSpeed * windPower * rb.mass;
+            rb.AddForce(windForce, ForceMode2D.Force);
+        }
+
+        protected virtual void IsUnderWater()
         {
             if (transform.position.y <= -0.5f && isUnderWater == false)
             {
                 isUnderWater = true;
                 rb.gravityScale /= 5;
                 rb.linearVelocity /= 500;
-                rb.angularVelocity /= 10; // 물에 들어가면 회전도 감속되도록 추가하면 자연스럽습니다.
+                rb.angularVelocity /= 10;
             }
             else if (transform.position.y > -0.5f && isUnderWater)
             {
@@ -89,7 +118,7 @@ namespace Babel
             }
         }
 
-        private void OnCollisionEnter2D(Collision2D collision)
+        protected virtual void OnCollisionEnter2D(Collision2D collision)
         {
             if (GameManager.Instance.isGameOver) return;
             if (HasLost) return;
@@ -97,19 +126,29 @@ namespace Babel
             if (HasFirstContact == false)
             {
                 HasFirstContact = true;
-                GameManager.Instance.AddLoot(blockValue);
+                OnFirstContact(collision);
             }
         }
 
-        private void OnTriggerEnter2D(Collider2D collision)
+        protected virtual void OnTriggerEnter2D(Collider2D collision)
         {
             if (GameManager.Instance.isGameOver) return;
 
             if (collision.CompareTag("Underwater") && HasLost == false)
             {
                 HasLost = true;
-                GameManager.Instance.LostLoot(blockValue);
+                OnLost(collision);
             }
+        }
+
+        protected virtual void OnFirstContact(Collision2D collision)
+        {
+            GameManager.Instance.AddLoot(blockValue);
+        }
+
+        protected virtual void OnLost(Collider2D collision)
+        {
+            GameManager.Instance.LostLoot(blockValue);
         }
     }
 }

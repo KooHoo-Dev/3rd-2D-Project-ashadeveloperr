@@ -1,14 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Unity.Mathematics;
-
 
 namespace Babel
 {
-
     public class BackgroundManager : MonoBehaviour
     {
-
         public float flowSpeed = 2.0f;
         public Vector3 flowDirection = Vector3.left;
 
@@ -20,12 +16,16 @@ namespace Babel
         public GameObject cloudLayer;
         public int totalCloud = 10;
 
+        [Header("Wind Cloud Settings")]
+        public float cloudWindSpeedMultiplier = 0.35f;
+        public float minimumCloudSpeed = 0.2f;
+
         private List<Cloud> activeCloudList = new List<Cloud>();
         private Queue<Cloud> cloudQueue = new Queue<Cloud>();
 
         private void Start()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < totalCloud; i++)
             {
                 Cloud randCloud = FirstSpawnCloud();
 
@@ -44,13 +44,25 @@ namespace Babel
             ManageCloudQueue();
         }
 
+        public void SetWind(float windSpeed)
+        {
+            if (Mathf.Abs(windSpeed) < 0.05f)
+            {
+                flowSpeed = 0.0f;
+                return;
+            }
+
+            flowDirection = windSpeed < 0 ? Vector3.left : Vector3.right;
+            flowSpeed = Mathf.Max(minimumCloudSpeed, Mathf.Abs(windSpeed) * cloudWindSpeedMultiplier);
+        }
+
         private void MoveClouds()
         {
-            Vector3 globalFlowSpeed = flowDirection.normalized * ( flowSpeed * Time.deltaTime );
+            Vector3 globalFlowSpeed = flowDirection.normalized * (flowSpeed * Time.deltaTime);
 
             for (int i = 0; i < activeCloudList.Count; i++)
             {
-                if(activeCloudList[i] != null)
+                if (activeCloudList[i] != null)
                 {
                     activeCloudList[i].Move(globalFlowSpeed);
                 }
@@ -66,37 +78,75 @@ namespace Babel
                 Cloud currentCloud = activeCloudList[i];
                 if (currentCloud == null) continue;
 
-                bool shouldDisable = false;
-
-                if (flowDirection.x < 0)
-                {
-                    shouldDisable = currentCloud.transform.position.x <= CloudPivotLeft.position.x;
-                }
-                else if (flowDirection.x > 0)
-                {
-                    shouldDisable = currentCloud.transform.position.x >= CloudPivotRight.position.x;
-                }
+                bool shouldDisable = IsCloudOutOfBounds(currentCloud);
 
                 if (shouldDisable)
                 {
                     activeCloudList.RemoveAt(i);
 
+                    ResetCloudPositionByDirection(currentCloud);
+
                     currentCloud.gameObject.SetActive(false);
-
-                    float randomHeight = UnityEngine.Random.Range(12.0f, 18.0f);
-
-                    if (flowDirection.x < 0)
-                    {
-                        currentCloud.transform.position = new Vector2(CloudPivotRight.position.x, randomHeight);
-                    }
-                    else if (flowDirection.x > 0)
-                    {
-                        currentCloud.transform.position = new Vector2(CloudPivotLeft.position.x, randomHeight);
-                    }
-
                     cloudQueue.Enqueue(currentCloud);
                 }
             }
+        }
+
+        private bool IsCloudOutOfBounds(Cloud cloud)
+        {
+            SpriteRenderer spriteRenderer = cloud.GetComponent<SpriteRenderer>();
+
+            if (spriteRenderer == null)
+            {
+                if (flowDirection.x < 0)
+                {
+                    return cloud.transform.position.x <= CloudPivotLeft.position.x;
+                }
+                else if (flowDirection.x > 0)
+                {
+                    return cloud.transform.position.x >= CloudPivotRight.position.x;
+                }
+
+                return false;
+            }
+
+            if (flowDirection.x < 0)
+            {
+                return spriteRenderer.bounds.max.x <= CloudPivotLeft.position.x;
+            }
+            else if (flowDirection.x > 0)
+            {
+                return spriteRenderer.bounds.min.x >= CloudPivotRight.position.x;
+            }
+
+            return false;
+        }
+
+        private void ResetCloudPositionByDirection(Cloud cloud)
+        {
+            float randomHeight = Random.Range(12.0f, 18.0f);
+
+            SpriteRenderer spriteRenderer = cloud.GetComponent<SpriteRenderer>();
+            float halfWidth = 0.0f;
+
+            if (spriteRenderer != null)
+            {
+                halfWidth = spriteRenderer.bounds.extents.x;
+            }
+
+            Vector3 resetPosition = cloud.transform.position;
+
+            if (flowDirection.x < 0)
+            {
+                resetPosition.x = CloudPivotRight.position.x + halfWidth;
+            }
+            else if (flowDirection.x > 0)
+            {
+                resetPosition.x = CloudPivotLeft.position.x - halfWidth;
+            }
+
+            resetPosition.y = randomHeight;
+            cloud.transform.position = resetPosition;
         }
 
         private Cloud SpawnRandomCloud()
@@ -105,16 +155,7 @@ namespace Babel
 
             Cloud cloud = Instantiate(cloudPrefab, cloudLayer.transform);
 
-            float randomHeight = UnityEngine.Random.Range(12.0f, 18.0f);
-
-            if (flowDirection.x < 0)
-            {
-                cloud.transform.position = new Vector2(CloudPivotRight.position.x, randomHeight);
-            }
-            if (flowDirection.x > 0)
-            {
-                cloud.transform.position = new Vector2(CloudPivotLeft.position.x, randomHeight);
-            }
+            ResetCloudPositionByDirection(cloud);
 
             return cloud;
         }
@@ -125,17 +166,18 @@ namespace Babel
 
             Cloud cloud = Instantiate(cloudPrefab, cloudLayer.transform);
 
-            float randomHeight = UnityEngine.Random.Range(12.0f, 18.0f);
-            float firstRandomSpawnPosition = UnityEngine.Random.Range(-30.0f, 70.0f);
+            float randomHeight = Random.Range(12.0f, 18.0f);
 
-            if (flowDirection.x < 0)
-            {
-                cloud.transform.position = new Vector2(firstRandomSpawnPosition, randomHeight);
-            }
-            if (flowDirection.x > 0)
-            {
-                cloud.transform.position = new Vector2(firstRandomSpawnPosition, randomHeight);
-            }
+            float leftX = Mathf.Min(CloudPivotLeft.position.x, CloudPivotRight.position.x);
+            float rightX = Mathf.Max(CloudPivotLeft.position.x, CloudPivotRight.position.x);
+
+            float firstRandomSpawnPosition = Random.Range(leftX, rightX);
+
+            cloud.transform.position = new Vector3(
+                firstRandomSpawnPosition,
+                randomHeight,
+                cloud.transform.position.z
+            );
 
             return cloud;
         }
@@ -143,10 +185,11 @@ namespace Babel
         private void ManageCloudQueue()
         {
             int totalCloudCount = activeCloudList.Count + cloudQueue.Count;
-            
-            if(totalCloudCount < totalCloud)
+
+            if (totalCloudCount < totalCloud)
             {
                 Cloud randCloud = SpawnRandomCloud();
+
                 if (randCloud != null)
                 {
                     randCloud.gameObject.SetActive(false);
@@ -162,6 +205,5 @@ namespace Babel
                 activeCloudList.Add(enableCloud);
             }
         }
-
     }
 }

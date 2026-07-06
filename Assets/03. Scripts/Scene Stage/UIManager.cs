@@ -42,30 +42,70 @@ namespace Babel
         private float currentCamZoom = 20;
         private float currentCamZoomTarget = 20;
 
+        [Header("튜토리얼 스플래시 UI")]
+        [SerializeField] private GameObject tutorialSplashUI;
+        [SerializeField] private RectTransform tutorialSplashRectTransform;
+        [SerializeField] private float tutorialSplashHideDuration = 0.6f;
+        private Vector2 tutorialSplashStartHidePosition;
+        private float tutorialSplashHideTimer;
+
+        public bool IsTutorialSplashActive { get; private set; }
+
+        private Vector2 tutorialSplashRootPosition;
+        private Vector2 tutorialSplashHidePosition;
+        private bool isTutorialSplashHiding;
+
+        [Header("바람 UI")]
+        public TMP_Text windText;
+
         protected override void Awake()
         {
-
             Time.timeScale = 1.0f;
             onPause = false;
+
             Cam = Camera.main;
+
             resultScreenRectTransform = resultScreen.GetComponent<RectTransform>();
             inGameUIRectTransform = inGameUI.GetComponent<RectTransform>();
             InteractUIRightRectTransform = InteractUIRight.GetComponent<RectTransform>();
+
+            if (tutorialSplashUI != null && tutorialSplashRectTransform == null)
+            {
+                tutorialSplashRectTransform = tutorialSplashUI.GetComponent<RectTransform>();
+            }
         }
 
         private void Start()
         {
+            if (ship == null && GameManager.Instance != null)
+            {
+                ship = GameManager.Instance.ship;
+            }
+
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
             float screenWidth = canvasRect.rect.width;
 
             inGameUIRectTransform.anchoredPosition = new Vector2(0, screenHeight);
             InteractUIRightRectTransform.anchoredPosition = new Vector2(screenWidth, 0);
-            SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
+
+            if (ship != null)
+            {
+                SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
+            }
+
+            InitializeTutorialSplash(screenHeight);
         }
+
         private void Update()
         {
             SetScreensPosition();
+
+            if (UpdateTutorialSplash())
+            {
+                return;
+            }
+
             if (GameManager.Instance.isGameOver)
             {
                 CameraReset();
@@ -80,8 +120,159 @@ namespace Babel
                     TogglePause();
                 }
             }
+
             SinkingUI();
-            
+        }
+
+        private void EndTutorialSplash()
+        {
+            if (tutorialSplashRectTransform != null)
+            {
+                tutorialSplashRectTransform.anchoredPosition = tutorialSplashHidePosition;
+            }
+
+            if (tutorialSplashUI != null)
+            {
+                tutorialSplashUI.SetActive(false);
+            }
+
+            IsTutorialSplashActive = false;
+            isTutorialSplashHiding = false;
+            tutorialSplashHideTimer = 0.0f;
+
+            onPause = false;
+
+            if (pauseUI != null)
+            {
+                pauseUI.SetActive(false);
+            }
+
+            if (pauseUIScreen != null)
+            {
+                pauseUIScreen.SetActive(false);
+            }
+
+            Time.timeScale = 1.0f;
+        }
+
+        private void InitializeTutorialSplash(float screenHeight)
+        {
+            if (tutorialSplashUI == null || tutorialSplashRectTransform == null)
+            {
+                IsTutorialSplashActive = false;
+                isTutorialSplashHiding = false;
+                tutorialSplashHideTimer = 0.0f;
+                Time.timeScale = 1.0f;
+                return;
+            }
+
+            tutorialSplashRootPosition = tutorialSplashRectTransform.anchoredPosition;
+
+            tutorialSplashHidePosition =
+                tutorialSplashRootPosition +
+                new Vector2(0, screenHeight + tutorialSplashRectTransform.rect.height);
+
+            bool shouldShow =
+                TotalGameManager.Instance != null &&
+                TotalGameManager.Instance.HasSeenStageTutorialSplash == false;
+
+            IsTutorialSplashActive = shouldShow;
+            isTutorialSplashHiding = false;
+            tutorialSplashHideTimer = 0.0f;
+
+            if (shouldShow)
+            {
+                tutorialSplashUI.SetActive(true);
+                tutorialSplashRectTransform.anchoredPosition = tutorialSplashRootPosition;
+
+                Time.timeScale = 0.0f;
+            }
+            else
+            {
+                tutorialSplashRectTransform.anchoredPosition = tutorialSplashHidePosition;
+                tutorialSplashUI.SetActive(false);
+
+                Time.timeScale = 1.0f;
+            }
+        }
+
+        private bool UpdateTutorialSplash()
+        {
+            if (IsTutorialSplashActive == false)
+            {
+                return false;
+            }
+
+            if (tutorialSplashUI == null || tutorialSplashRectTransform == null)
+            {
+                EndTutorialSplash();
+                return true;
+            }
+
+            if (isTutorialSplashHiding == false && WasTutorialDismissInputPressed())
+            {
+                isTutorialSplashHiding = true;
+                tutorialSplashHideTimer = 0.0f;
+                tutorialSplashStartHidePosition = tutorialSplashRectTransform.anchoredPosition;
+
+                if (TotalGameManager.Instance != null)
+                {
+                    TotalGameManager.Instance.MarkStageTutorialSplashSeen();
+                }
+            }
+
+            if (isTutorialSplashHiding)
+            {
+                tutorialSplashHideTimer += Time.unscaledDeltaTime;
+
+                float t = Mathf.Clamp01(tutorialSplashHideTimer / tutorialSplashHideDuration);
+
+                tutorialSplashRectTransform.anchoredPosition = Vector2.Lerp(
+                    tutorialSplashStartHidePosition,
+                    tutorialSplashHidePosition,
+                    t
+                );
+
+                if (t >= 1.0f)
+                {
+                    EndTutorialSplash();
+                }
+            }
+
+            return true;
+        }
+
+        private bool WasTutorialDismissInputPressed()
+        {
+            bool keyboardPressed =
+                Keyboard.current != null &&
+                Keyboard.current.anyKey.wasPressedThisFrame;
+
+            bool mousePressed =
+                Mouse.current != null &&
+                (
+                    Mouse.current.leftButton.wasPressedThisFrame ||
+                    Mouse.current.rightButton.wasPressedThisFrame ||
+                    Mouse.current.middleButton.wasPressedThisFrame
+                );
+
+            return keyboardPressed || mousePressed;
+        }
+
+        public void UpdateWindDisplay(float windSpeed)
+        {
+            if (windText == null) return;
+
+            float absSpeed = Mathf.Abs(windSpeed);
+
+            if (absSpeed < 0.05f)
+            {
+                windText.SetText("-- 0.0m/s");
+                return;
+            }
+
+            string directionText = windSpeed < 0 ? "<<" : ">>";
+            windText.SetText($"{directionText} {absSpeed:0.0}m/s");
         }
 
         public void TogglePause()
@@ -143,15 +334,21 @@ namespace Babel
         {
             if (GameManager.Instance.isFailed)
             {
-                NextStageText.SetText("Retry");
-                ResultTitle.SetText("Arrrgh! We lost the ship!");
+                NextStageText.SetText("Restart");
+                ResultTitle.SetText("SUNK...");
             }
             else
             {
-                NextStageText.SetText("Next");
-                if (totalClosing <= 0) ResultTitle.SetText("At least, She’s still afloat!");
-                else ResultTitle.SetText("Aye! Look at all this booty!");
-
+                if (totalClosing <= 0)
+                {
+                    NextStageText.SetText("Retry");
+                    ResultTitle.SetText("ALIVE?");
+                }
+                else
+                {
+                    NextStageText.SetText("Next");
+                    ResultTitle.SetText("SAIL!");
+                }
             }
 
             RectTransform canvasRect = GetComponent<RectTransform>();
