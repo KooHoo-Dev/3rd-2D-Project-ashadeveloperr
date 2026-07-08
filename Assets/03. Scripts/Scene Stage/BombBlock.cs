@@ -1,12 +1,11 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace Babel
 {
     public class BombBlock : Block
     {
-        [Header("Bomb Timer Settings")]
+        [Header("폭탄 대기 시간")]
         [SerializeField] private float minIdleTime = 2.0f;
         [SerializeField] private float maxIdleTime = 5.0f;
         [SerializeField] private bool waitUntilAlmostStopped = true;
@@ -14,42 +13,39 @@ namespace Babel
         [SerializeField] private float restingAngularVelocity = 15.0f;
         [SerializeField] private float requiredRestingTime = 0.35f;
 
-        [Header("Bomb Warning Settings")]
+        [Header("폭탄 경고 연출")]
         [SerializeField] private float warningDuration = 1.2f;
         [SerializeField] private Color hotColor = Color.red;
         [SerializeField] private Color explodedColor = new Color(0.15f, 0.15f, 0.15f, 1.0f);
 
-        [Header("Bomb Shake Settings")]
+        [Header("폭탄 흔들림")]
         [SerializeField] private Transform visualRoot;
         [SerializeField] private float shakeAmount = 0.08f;
         [SerializeField] private float shakeFrequency = 45.0f;
         [SerializeField] private bool shakeGetsStronger = true;
 
-        [Header("Explosion Settings")]
+        [Header("폭발 설정")]
         [SerializeField] private float explosionRadius = 4.0f;
         [SerializeField] private float explosionForce = 35.0f;
         [SerializeField] private float minimumForceRatio = 0.25f;
         [SerializeField] private float explosionTorque = 20.0f;
         [SerializeField] private LayerMask explosionTargetMask;
 
-        [Header("Chicken Bonus Settings")]
+        [Header("치킨 보너스")]
         [SerializeField] private int friedChickenBonusScore = 300;
 
-        [Header("Effect")]
+        [Header("폭발 이펙트")]
         [SerializeField] private GameObject explosionEffectPrefab;
 
         private SpriteRenderer spriteRenderer;
         private Color originalColor;
-
+        private Vector3 visualRootOriginLocalPosition;
         private bool fuseStarted;
         private bool hasExploded;
-
-        private Vector3 visualRootOriginLocalPosition;
 
         protected override void Awake()
         {
             base.Awake();
-
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
             if (spriteRenderer != null)
@@ -71,7 +67,6 @@ namespace Babel
         protected override void OnFirstContact(Collision2D collision)
         {
             base.OnFirstContact(collision);
-
             if (isFired == false) return;
             if (fuseStarted) return;
             if (hasExploded) return;
@@ -83,7 +78,7 @@ namespace Babel
         private IEnumerator BombRoutine()
         {
             if (isFired == false) yield break;
-            if (GameManager.Instance.isGameOver) yield break;
+            if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
             if (waitUntilAlmostStopped)
@@ -92,18 +87,17 @@ namespace Babel
             }
 
             if (isFired == false) yield break;
-            if (GameManager.Instance.isGameOver) yield break;
+            if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
             float idleTime = Random.Range(minIdleTime, maxIdleTime);
             yield return new WaitForSeconds(idleTime);
 
             if (isFired == false) yield break;
-            if (GameManager.Instance.isGameOver) yield break;
+            if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
             yield return WarningRoutine();
-
             Explode();
         }
 
@@ -114,12 +108,10 @@ namespace Babel
             while (restingTimer < requiredRestingTime)
             {
                 if (isFired == false) yield break;
-                if (GameManager.Instance.isGameOver) yield break;
+                if (GameManager.Instance.IsGameOver) yield break;
                 if (HasLost) yield break;
 
-                bool isAlmostStopped =
-                    rb.linearVelocity.sqrMagnitude <= restingVelocity * restingVelocity &&
-                    Mathf.Abs(rb.angularVelocity) <= restingAngularVelocity;
+                bool isAlmostStopped = rb.linearVelocity.sqrMagnitude <= restingVelocity * restingVelocity && Mathf.Abs(rb.angularVelocity) <= restingAngularVelocity;
 
                 if (isAlmostStopped)
                 {
@@ -146,27 +138,20 @@ namespace Babel
             while (timer < warningDuration)
             {
                 if (isFired == false) yield break;
-                if (GameManager.Instance.isGameOver) yield break;
+                if (GameManager.Instance.IsGameOver) yield break;
                 if (HasLost) yield break;
 
                 timer += Time.deltaTime;
-
                 float t = Mathf.Clamp01(timer / warningDuration);
                 float pulse = Mathf.PingPong(timer * 8.0f, 1.0f);
 
                 if (spriteRenderer != null)
                 {
-                    Color targetColor = Color.Lerp(
-                        originalColor,
-                        hotColor,
-                        Mathf.Lerp(t, 1.0f, pulse)
-                    );
-
+                    Color targetColor = Color.Lerp(originalColor, hotColor, Mathf.Lerp(t, 1.0f, pulse));
                     spriteRenderer.color = targetColor;
                 }
 
                 ShakeVisual(t);
-
                 yield return null;
             }
 
@@ -189,85 +174,61 @@ namespace Babel
                 currentShakeAmount *= Mathf.Lerp(0.25f, 1.0f, warningProgress);
             }
 
-            float shakeX = Mathf.Sin(Time.time * shakeFrequency) * currentShakeAmount;
-            float shakeY = Mathf.Cos(Time.time * shakeFrequency * 1.37f) * currentShakeAmount * 0.5f;
-
-            visualRoot.localPosition = visualRootOriginLocalPosition + new Vector3(shakeX, shakeY, 0.0f);
+            float x = Mathf.Sin(Time.time * shakeFrequency) * currentShakeAmount;
+            float y = Mathf.Cos(Time.time * shakeFrequency * 1.37f) * currentShakeAmount;
+            visualRoot.localPosition = visualRootOriginLocalPosition + new Vector3(x, y, 0.0f);
         }
 
         private void ResetVisualPosition()
         {
-            if (visualRoot == null) return;
-
-            visualRoot.localPosition = visualRootOriginLocalPosition;
+            if (visualRoot != null)
+            {
+                visualRoot.localPosition = visualRootOriginLocalPosition;
+            }
         }
 
         private void Explode()
         {
             if (hasExploded) return;
-            if (isFired == false) return;
-            if (HasLost) return;
-            if (GameManager.Instance.isGameOver) return;
 
             hasExploded = true;
-
             ResetVisualPosition();
+
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = explodedColor;
+            }
 
             if (explosionEffectPrefab != null)
             {
                 Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
             }
 
-            Collider2D[] hits = Physics2D.OverlapCircleAll(
-                transform.position,
-                explosionRadius,
-                explosionTargetMask
-            );
+            Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, explosionRadius, explosionTargetMask);
 
-            HashSet<Rigidbody2D> pushedBodies = new HashSet<Rigidbody2D>();
-
-            for (int i = 0; i < hits.Length; i++)
+            foreach (Collider2D target in targets)
             {
-                Collider2D hit = hits[i];
-                if (hit == null) continue;
+                if (target == null) continue;
+                if (target.transform == transform) continue;
 
-                Rigidbody2D targetRb = hit.attachedRigidbody;
-                if (targetRb == null) continue;
-                if (targetRb == rb) continue;
-                if (pushedBodies.Contains(targetRb)) continue;
+                Rigidbody2D targetRigidbody = target.attachedRigidbody;
 
-                pushedBodies.Add(targetRb);
-
-                Vector2 direction = targetRb.worldCenterOfMass - (Vector2)transform.position;
-
-                if (direction.sqrMagnitude <= 0.01f)
+                if (targetRigidbody != null)
                 {
-                    direction = Random.insideUnitCircle.normalized;
+                    Vector2 direction = targetRigidbody.worldCenterOfMass - (Vector2)transform.position;
+                    float distance = Mathf.Max(direction.magnitude, 0.1f);
+                    float forceRatio = Mathf.Clamp01(1.0f - distance / explosionRadius);
+                    forceRatio = Mathf.Max(forceRatio, minimumForceRatio);
+                    Vector2 forceDirection = direction.normalized;
+                    targetRigidbody.AddForce(forceDirection * explosionForce * forceRatio, ForceMode2D.Impulse);
+                    targetRigidbody.AddTorque(Random.Range(-explosionTorque, explosionTorque) * forceRatio, ForceMode2D.Impulse);
                 }
 
-                float distance = direction.magnitude;
-                float distanceRatio = Mathf.Clamp01(1.0f - distance / explosionRadius);
-
-                float finalForce = explosionForce * Mathf.Lerp(
-                    minimumForceRatio,
-                    1.0f,
-                    distanceRatio
-                );
-
-                targetRb.AddForce(direction.normalized * finalForce, ForceMode2D.Impulse);
-                targetRb.AddTorque(Random.Range(-explosionTorque, explosionTorque), ForceMode2D.Impulse);
-
-                ChickenBlock chickenBlock = hit.GetComponentInParent<ChickenBlock>();
-
+                ChickenBlock chickenBlock = target.GetComponentInParent<ChickenBlock>();
                 if (chickenBlock != null)
                 {
                     chickenBlock.Fry(friedChickenBonusScore);
                 }
-            }
-
-            if (spriteRenderer != null)
-            {
-                spriteRenderer.color = explodedColor;
             }
         }
 

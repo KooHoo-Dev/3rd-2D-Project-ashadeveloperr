@@ -1,38 +1,43 @@
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Babel
 {
     public class BackgroundManager : MonoBehaviour
     {
-        public float flowSpeed = 2.0f;
-        public Vector3 flowDirection = Vector3.left;
+        [Header("구름 흐름")]
+        [SerializeField] private float flowSpeed = 2.0f;
+        [SerializeField] private Vector3 flowDirection = Vector3.left;
 
-        public Transform CloudPivotLeft;
-        public Transform CloudPivotRight;
+        [Header("구름 생성 기준점")]
+        [FormerlySerializedAs("CloudPivotLeft")]
+        [SerializeField] private Transform cloudPivotLeft;
+        [FormerlySerializedAs("CloudPivotRight")]
+        [SerializeField] private Transform cloudPivotRight;
 
-        public Cloud cloudPrefab;
+        [Header("구름 프리팹")]
+        [SerializeField] private Cloud cloudPrefab;
+        [SerializeField] private GameObject cloudLayer;
+        [SerializeField] private int totalCloud = 10;
 
-        public GameObject cloudLayer;
-        public int totalCloud = 10;
+        [Header("바람에 따른 구름 속도")]
+        [SerializeField] private float cloudWindSpeedMultiplier = 0.35f;
+        [SerializeField] private float minimumCloudSpeed = 0.2f;
 
-        [Header("Wind Cloud Settings")]
-        public float cloudWindSpeedMultiplier = 0.35f;
-        public float minimumCloudSpeed = 0.2f;
-
-        private List<Cloud> activeCloudList = new List<Cloud>();
-        private Queue<Cloud> cloudQueue = new Queue<Cloud>();
+        private readonly List<Cloud> activeCloudList = new List<Cloud>();
+        private readonly Queue<Cloud> cloudQueue = new Queue<Cloud>();
 
         private void Start()
         {
             for (int i = 0; i < totalCloud; i++)
             {
-                Cloud randCloud = FirstSpawnCloud();
+                Cloud randomCloud = FirstSpawnCloud();
 
-                if (randCloud != null)
+                if (randomCloud != null)
                 {
-                    randCloud.gameObject.SetActive(false);
-                    cloudQueue.Enqueue(randCloud);
+                    randomCloud.gameObject.SetActive(false);
+                    cloudQueue.Enqueue(randomCloud);
                 }
             }
         }
@@ -83,9 +88,7 @@ namespace Babel
                 if (shouldDisable)
                 {
                     activeCloudList.RemoveAt(i);
-
                     ResetCloudPositionByDirection(currentCloud);
-
                     currentCloud.gameObject.SetActive(false);
                     cloudQueue.Enqueue(currentCloud);
                 }
@@ -100,11 +103,11 @@ namespace Babel
             {
                 if (flowDirection.x < 0)
                 {
-                    return cloud.transform.position.x <= CloudPivotLeft.position.x;
+                    return cloud.transform.position.x <= cloudPivotLeft.position.x;
                 }
                 else if (flowDirection.x > 0)
                 {
-                    return cloud.transform.position.x >= CloudPivotRight.position.x;
+                    return cloud.transform.position.x >= cloudPivotRight.position.x;
                 }
 
                 return false;
@@ -112,11 +115,11 @@ namespace Babel
 
             if (flowDirection.x < 0)
             {
-                return spriteRenderer.bounds.max.x <= CloudPivotLeft.position.x;
+                return spriteRenderer.bounds.max.x <= cloudPivotLeft.position.x;
             }
             else if (flowDirection.x > 0)
             {
-                return spriteRenderer.bounds.min.x >= CloudPivotRight.position.x;
+                return spriteRenderer.bounds.min.x >= cloudPivotRight.position.x;
             }
 
             return false;
@@ -125,7 +128,6 @@ namespace Babel
         private void ResetCloudPositionByDirection(Cloud cloud)
         {
             float randomHeight = Random.Range(12.0f, 18.0f);
-
             SpriteRenderer spriteRenderer = cloud.GetComponent<SpriteRenderer>();
             float halfWidth = 0.0f;
 
@@ -138,11 +140,11 @@ namespace Babel
 
             if (flowDirection.x < 0)
             {
-                resetPosition.x = CloudPivotRight.position.x + halfWidth;
+                resetPosition.x = cloudPivotRight.position.x + halfWidth;
             }
             else if (flowDirection.x > 0)
             {
-                resetPosition.x = CloudPivotLeft.position.x - halfWidth;
+                resetPosition.x = cloudPivotLeft.position.x - halfWidth;
             }
 
             resetPosition.y = randomHeight;
@@ -154,9 +156,7 @@ namespace Babel
             if (cloudPrefab == null) return null;
 
             Cloud cloud = Instantiate(cloudPrefab, cloudLayer.transform);
-
             ResetCloudPositionByDirection(cloud);
-
             return cloud;
         }
 
@@ -165,20 +165,11 @@ namespace Babel
             if (cloudPrefab == null) return null;
 
             Cloud cloud = Instantiate(cloudPrefab, cloudLayer.transform);
-
             float randomHeight = Random.Range(12.0f, 18.0f);
-
-            float leftX = Mathf.Min(CloudPivotLeft.position.x, CloudPivotRight.position.x);
-            float rightX = Mathf.Max(CloudPivotLeft.position.x, CloudPivotRight.position.x);
-
+            float leftX = Mathf.Min(cloudPivotLeft.position.x, cloudPivotRight.position.x);
+            float rightX = Mathf.Max(cloudPivotLeft.position.x, cloudPivotRight.position.x);
             float firstRandomSpawnPosition = Random.Range(leftX, rightX);
-
-            cloud.transform.position = new Vector3(
-                firstRandomSpawnPosition,
-                randomHeight,
-                cloud.transform.position.z
-            );
-
+            cloud.transform.position = new Vector3(firstRandomSpawnPosition, randomHeight, cloud.transform.position.z);
             return cloud;
         }
 
@@ -188,19 +179,18 @@ namespace Babel
 
             if (totalCloudCount < totalCloud)
             {
-                Cloud randCloud = SpawnRandomCloud();
+                Cloud randomCloud = SpawnRandomCloud();
 
-                if (randCloud != null)
+                if (randomCloud != null)
                 {
-                    randCloud.gameObject.SetActive(false);
-                    cloudQueue.Enqueue(randCloud);
+                    randomCloud.gameObject.SetActive(false);
+                    cloudQueue.Enqueue(randomCloud);
                 }
             }
 
             if (activeCloudList.Count < totalCloud && cloudQueue.Count > 0)
             {
                 Cloud enableCloud = cloudQueue.Dequeue();
-
                 enableCloud.gameObject.SetActive(true);
                 activeCloudList.Add(enableCloud);
             }

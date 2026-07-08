@@ -1,73 +1,88 @@
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace Babel
 {
-
     public class UIManager : SingletonBase<UIManager>
     {
-        protected override void OnInitialize()
-        {
-            base.OnInitialize();
-        }
+        [Header("화면 UI")]
+        [SerializeField] private GameObject resultScreen;
+        [SerializeField] private GameObject inGameUI;
+        [SerializeField] private GameObject pauseUI;
+        [FormerlySerializedAs("InteractUIRight")]
+        [SerializeField] private GameObject interactUIRight;
+        [SerializeField] private GameObject pauseUIScreen;
 
-        public GameObject resultScreen;
-        public GameObject inGameUI;
-        public GameObject pauseUI;
-        public GameObject InteractUIRight;
-        public GameObject pauseUIScreen;
-        public TMP_Text NextStageText;
-        public TMP_Text ResultTitle;
+        [Header("결과창 텍스트")]
+        [FormerlySerializedAs("NextStageText")]
+        [SerializeField] private TMP_Text nextStageText;
+        [FormerlySerializedAs("ResultTitle")]
+        [SerializeField] private TMP_Text resultTitle;
 
-        private Camera Cam { get; set; }
-        private RectTransform resultScreenRectTransform;
-        private RectTransform inGameUIRectTransform;
-        private RectTransform InteractUIRightRectTransform;
+        [Header("바람 UI")]
+        [SerializeField] private TMP_Text windText;
 
-        private Vector2 resultScreenRootPosition;
-        private Vector2 inGameUIRootPosition;
-        private Vector2 interactUIRightRootPosition;
-        private bool onResult = false;
-        public bool onPause = false;
-
-        public Ship ship;
-
-        private Transform currentTarget;
-        private Vector3 currentOffset;
-        public Vector3 shipPosOffset = new Vector3(-10, 7, 0);
-        public Vector3 throwerOffset = new Vector3(-15, 7, 0);
-        public Vector3 blockOffset = new Vector3(0, 0, 0);
-        private float currentCamZoom = 20;
-        private float currentCamZoomTarget = 20;
+        [Header("카메라 오프셋")]
+        [FormerlySerializedAs("shipPosOffset")]
+        [SerializeField] private Vector3 shipPosOffset = new Vector3(-10, 7, 0);
+        [FormerlySerializedAs("throwerOffset")]
+        [SerializeField] private Vector3 throwerOffset = new Vector3(-15, 7, 0);
+        [FormerlySerializedAs("blockOffset")]
+        [SerializeField] private Vector3 blockOffset = Vector3.zero;
 
         [Header("튜토리얼 스플래시 UI")]
         [SerializeField] private GameObject tutorialSplashUI;
         [SerializeField] private RectTransform tutorialSplashRectTransform;
         [SerializeField] private float tutorialSplashHideDuration = 0.6f;
+
+        private Camera cam;
+        private RectTransform resultScreenRectTransform;
+        private RectTransform inGameUIRectTransform;
+        private RectTransform interactUIRightRectTransform;
+        private Ship ship;
+        private Transform currentTarget;
+        private Vector2 resultScreenRootPosition;
+        private Vector2 inGameUIRootPosition;
+        private Vector2 interactUIRightRootPosition;
+        private Vector2 tutorialSplashRootPosition;
+        private Vector2 tutorialSplashHidePosition;
         private Vector2 tutorialSplashStartHidePosition;
+        private Vector3 currentOffset;
+        private float currentCamZoom = 20f;
+        private float currentCamZoomTarget = 20f;
+        private bool onResult = false;
+        private bool onPause = false;
+        private bool isTutorialSplashHiding;
         private float tutorialSplashHideTimer;
 
         public bool IsTutorialSplashActive { get; private set; }
+        public Ship CurrentShip => ship;
+        public Vector3 ShipPosOffset => shipPosOffset;
+        public Vector3 ThrowerOffset => throwerOffset;
+        public Vector3 BlockOffset => blockOffset;
 
-        private Vector2 tutorialSplashRootPosition;
-        private Vector2 tutorialSplashHidePosition;
-        private bool isTutorialSplashHiding;
-
-        [Header("바람 UI")]
-        public TMP_Text windText;
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+        }
 
         protected override void Awake()
         {
+            base.Awake();
+
+            if (instance != this)
+            {
+                return;
+            }
+
             Time.timeScale = 1.0f;
             onPause = false;
-
-            Cam = Camera.main;
-
+            cam = Camera.main;
             resultScreenRectTransform = resultScreen.GetComponent<RectTransform>();
             inGameUIRectTransform = inGameUI.GetComponent<RectTransform>();
-            InteractUIRightRectTransform = InteractUIRight.GetComponent<RectTransform>();
+            interactUIRightRectTransform = interactUIRight.GetComponent<RectTransform>();
 
             if (tutorialSplashUI != null && tutorialSplashRectTransform == null)
             {
@@ -79,15 +94,14 @@ namespace Babel
         {
             if (ship == null && GameManager.Instance != null)
             {
-                ship = GameManager.Instance.ship;
+                ship = GameManager.Instance.CurrentShip;
             }
 
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
             float screenWidth = canvasRect.rect.width;
-
             inGameUIRectTransform.anchoredPosition = new Vector2(0, screenHeight);
-            InteractUIRightRectTransform.anchoredPosition = new Vector2(screenWidth, 0);
+            interactUIRightRectTransform.anchoredPosition = new Vector2(screenWidth, 0);
 
             if (ship != null)
             {
@@ -106,7 +120,7 @@ namespace Babel
                 return;
             }
 
-            if (GameManager.Instance.isGameOver)
+            if (GameManager.Instance.IsGameOver)
             {
                 CameraReset();
             }
@@ -124,6 +138,11 @@ namespace Babel
             SinkingUI();
         }
 
+        public void SetShip(Ship newShip)
+        {
+            ship = newShip;
+        }
+
         private void EndTutorialSplash()
         {
             if (tutorialSplashRectTransform != null)
@@ -139,7 +158,6 @@ namespace Babel
             IsTutorialSplashActive = false;
             isTutorialSplashHiding = false;
             tutorialSplashHideTimer = 0.0f;
-
             onPause = false;
 
             if (pauseUI != null)
@@ -167,15 +185,8 @@ namespace Babel
             }
 
             tutorialSplashRootPosition = tutorialSplashRectTransform.anchoredPosition;
-
-            tutorialSplashHidePosition =
-                tutorialSplashRootPosition +
-                new Vector2(0, screenHeight + tutorialSplashRectTransform.rect.height);
-
-            bool shouldShow =
-                TotalGameManager.Instance != null &&
-                TotalGameManager.Instance.HasSeenStageTutorialSplash == false;
-
+            tutorialSplashHidePosition = tutorialSplashRootPosition + new Vector2(0, screenHeight + tutorialSplashRectTransform.rect.height);
+            bool shouldShow = TotalGameManager.Instance != null && TotalGameManager.Instance.HasSeenStageTutorialSplash == false;
             IsTutorialSplashActive = shouldShow;
             isTutorialSplashHiding = false;
             tutorialSplashHideTimer = 0.0f;
@@ -184,14 +195,12 @@ namespace Babel
             {
                 tutorialSplashUI.SetActive(true);
                 tutorialSplashRectTransform.anchoredPosition = tutorialSplashRootPosition;
-
                 Time.timeScale = 0.0f;
             }
             else
             {
                 tutorialSplashRectTransform.anchoredPosition = tutorialSplashHidePosition;
                 tutorialSplashUI.SetActive(false);
-
                 Time.timeScale = 1.0f;
             }
         }
@@ -224,14 +233,8 @@ namespace Babel
             if (isTutorialSplashHiding)
             {
                 tutorialSplashHideTimer += Time.unscaledDeltaTime;
-
                 float t = Mathf.Clamp01(tutorialSplashHideTimer / tutorialSplashHideDuration);
-
-                tutorialSplashRectTransform.anchoredPosition = Vector2.Lerp(
-                    tutorialSplashStartHidePosition,
-                    tutorialSplashHidePosition,
-                    t
-                );
+                tutorialSplashRectTransform.anchoredPosition = Vector2.Lerp(tutorialSplashStartHidePosition, tutorialSplashHidePosition, t);
 
                 if (t >= 1.0f)
                 {
@@ -244,18 +247,8 @@ namespace Babel
 
         private bool WasTutorialDismissInputPressed()
         {
-            bool keyboardPressed =
-                Keyboard.current != null &&
-                Keyboard.current.anyKey.wasPressedThisFrame;
-
-            bool mousePressed =
-                Mouse.current != null &&
-                (
-                    Mouse.current.leftButton.wasPressedThisFrame ||
-                    Mouse.current.rightButton.wasPressedThisFrame ||
-                    Mouse.current.middleButton.wasPressedThisFrame
-                );
-
+            bool keyboardPressed = Keyboard.current != null && Keyboard.current.anyKey.wasPressedThisFrame;
+            bool mousePressed = Mouse.current != null && (Mouse.current.leftButton.wasPressedThisFrame || Mouse.current.rightButton.wasPressedThisFrame || Mouse.current.middleButton.wasPressedThisFrame);
             return keyboardPressed || mousePressed;
         }
 
@@ -314,53 +307,52 @@ namespace Babel
                 SetCameraTarget(ship.transform, shipPosOffset, currentCamZoom);
             }
 
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, (currentTarget.position + currentOffset), 1.8f * Time.deltaTime);
-            lerpPos.z = Cam.transform.position.z;
-            Cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
-            currentCamZoom = Cam.orthographicSize;
-            Cam.transform.position = lerpPos;
+            Vector3 lerpPos = Vector3.Lerp(cam.transform.position, currentTarget.position + currentOffset, 1.8f * Time.deltaTime);
+            lerpPos.z = cam.transform.position.z;
+            cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
+            currentCamZoom = cam.orthographicSize;
+            cam.transform.position = lerpPos;
         }
 
         private void CameraReset()
         {
             Vector3 offset = new Vector3(0, 18, 0);
-            Vector3 lerpPos = Vector3.Lerp(Cam.transform.position, Vector3.zero + offset, 0.4f * Time.deltaTime);
-            lerpPos.z = Cam.transform.position.z;
-            Cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
-            Cam.transform.position = lerpPos;
+            Vector3 lerpPos = Vector3.Lerp(cam.transform.position, Vector3.zero + offset, 0.4f * Time.deltaTime);
+            lerpPos.z = cam.transform.position.z;
+            cam.orthographicSize = Mathf.Lerp(currentCamZoom, currentCamZoomTarget, 2.5f * Time.deltaTime);
+            cam.transform.position = lerpPos;
         }
 
         public void ShowResultWindow(int totalClosing)
         {
-            if (GameManager.Instance.isFailed)
+            if (GameManager.Instance.IsFailed)
             {
-                NextStageText.SetText("Restart");
-                ResultTitle.SetText("SUNK...");
+                nextStageText.SetText("Restart");
+                resultTitle.SetText("SUNK...");
             }
             else
             {
                 if (totalClosing <= 0)
                 {
-                    NextStageText.SetText("Retry");
-                    ResultTitle.SetText("ALIVE?");
+                    nextStageText.SetText("Retry");
+                    resultTitle.SetText("ALIVE?");
                 }
                 else
                 {
-                    NextStageText.SetText("Next");
-                    ResultTitle.SetText("SAIL!");
+                    nextStageText.SetText("Next");
+                    resultTitle.SetText("SAIL!");
                 }
             }
 
             RectTransform canvasRect = GetComponent<RectTransform>();
             float screenHeight = canvasRect.rect.height;
             float screenWidth = canvasRect.rect.width;
-
             resultScreenRootPosition = Vector2.zero;
             inGameUIRootPosition = new Vector2(0, screenHeight);
             interactUIRightRootPosition = new Vector2(0, screenWidth);
             onResult = true;
         }
-        
+
         private void SetScreensPosition()
         {
             if (onResult)
@@ -369,13 +361,15 @@ namespace Babel
                 {
                     resultScreenRectTransform.anchoredPosition = Vector2.Lerp(resultScreenRectTransform.anchoredPosition, resultScreenRootPosition, Time.deltaTime * 3.5f);
                 }
+
                 if (Vector2.Distance(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition) >= 0.1f)
                 {
                     inGameUIRectTransform.anchoredPosition = Vector2.Lerp(inGameUIRectTransform.anchoredPosition, inGameUIRootPosition, Time.deltaTime * 1.5f);
                 }
-                if (Vector2.Distance(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
+
+                if (Vector2.Distance(interactUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
                 {
-                    InteractUIRightRectTransform.anchoredPosition = Vector2.Lerp(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.5f);
+                    interactUIRightRectTransform.anchoredPosition = Vector2.Lerp(interactUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 1.5f);
                 }
             }
             else
@@ -386,7 +380,6 @@ namespace Babel
                 interactUIRightRootPosition = new Vector2(screenWidth, 0);
                 resultScreenRectTransform.anchoredPosition = new Vector2(0, -screenHeight);
                 resultScreenRootPosition = resultScreenRectTransform.anchoredPosition;
-
             }
         }
 
@@ -402,7 +395,7 @@ namespace Babel
         {
             if (onResult) return;
 
-            if (GameManager.Instance.sinkPoint > 0)
+            if (GameManager.Instance.SinkPoint > 0)
             {
                 interactUIRightRootPosition = Vector2.zero;
             }
@@ -413,10 +406,9 @@ namespace Babel
                 interactUIRightRootPosition = new Vector2(screenWidth, 0);
             }
 
-
-            if (Vector2.Distance(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
+            if (Vector2.Distance(interactUIRightRectTransform.anchoredPosition, interactUIRightRootPosition) >= 0.1f)
             {
-                InteractUIRightRectTransform.anchoredPosition = Vector2.Lerp(InteractUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 2.5f);
+                interactUIRightRectTransform.anchoredPosition = Vector2.Lerp(interactUIRightRectTransform.anchoredPosition, interactUIRightRootPosition, Time.deltaTime * 2.5f);
             }
         }
     }

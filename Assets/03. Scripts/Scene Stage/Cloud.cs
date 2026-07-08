@@ -1,19 +1,18 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Babel
 {
-
     public class Cloud : MonoBehaviour
     {
-        private float minScale = 0.6f;
-        private float maxScale = 1.0f;
+        [Header("구름 스프라이트")]
+        [SerializeField] private Sprite[] sprites;
 
-        SpriteRenderer spriteRenderer;
+        [Header("구름 크기")]
+        [SerializeField] private float minScale = 0.6f;
+        [SerializeField] private float maxScale = 1.0f;
 
-        public Sprite[] sprites;
-
-        private float speedWeight = 1.0f; // 구름 속도 랜덤 가중치임
+        private SpriteRenderer spriteRenderer;
+        private float speedWeight = 1.0f;
 
         private void Awake()
         {
@@ -30,7 +29,6 @@ namespace Babel
 
             float randomScale = Random.Range(minScale, maxScale);
             transform.localScale = Vector3.one * randomScale;
-
             speedWeight = 1.0f / randomScale;
         }
 
@@ -39,6 +37,4 @@ namespace Babel
             transform.Translate(flowSpeed * speedWeight);
         }
     }
-
-
 }

@@ -4,48 +4,43 @@ namespace Babel
 {
     public class MainMenuUIManager : MonoBehaviour
     {
-        [Header("UI Refs")]
-        public RectTransform titleText;
-        public RectTransform root;
+        [Header("UI 참조")]
+        [SerializeField] private RectTransform titleText;
+        [SerializeField] private RectTransform root;
 
-        [Header("Camera Refs")]
-        public Transform cameraTargetPivot;
+        [Header("카메라 참조")]
+        [SerializeField] private Transform cameraTargetPivot;
 
-        [Header("UI Move Settings")]
-        public float titleMoveSpeed = 2.0f;
-        public float rootMoveSpeed = 2.0f;
-        public float titleStartDelay = 0.1f;
-        public float rootStartDelay = 0.25f;
+        [Header("UI 이동 설정")]
+        [SerializeField] private float titleMoveSpeed = 2.0f;
+        [SerializeField] private float rootMoveSpeed = 2.0f;
+        [SerializeField] private float titleStartDelay = 0.1f;
+        [SerializeField] private float rootStartDelay = 0.25f;
 
-        [Header("Camera Move Settings")]
-        public Vector3 cameraStartOffset = new Vector3(0, 8, 0);
-        public Vector3 cameraTargetOffset = Vector3.zero;
-        public float cameraMoveSpeed = 1.2f;
+        [Header("카메라 이동 설정")]
+        [SerializeField] private Vector3 cameraStartOffset = new Vector3(0, 8, 0);
+        [SerializeField] private Vector3 cameraTargetOffset = Vector3.zero;
+        [SerializeField] private float cameraMoveSpeed = 1.2f;
 
-        [Header("Camera Floating Settings")]
-        public float floatingAmount = 0.25f;
-        public float floatingSpeed = 0.6f;
-        public float floatingFollowSpeed = 1.2f;
+        [Header("카메라 부유 연출")]
+        [SerializeField] private float floatingAmount = 0.25f;
+        [SerializeField] private float floatingSpeed = 0.6f;
+        [SerializeField] private float floatingFollowSpeed = 1.2f;
 
         private Camera cam;
         private RectTransform canvasRectTransform;
-
         private Vector2 titleRootPosition;
         private Vector2 rootRootPosition;
-
         private float introTimer;
         private float floatingTimer;
         private float cameraZ;
-
         private bool cameraIntroFinished = false;
 
         private void Awake()
         {
             Time.timeScale = 1.0f;
-
             cam = Camera.main;
             canvasRectTransform = GetComponent<RectTransform>();
-
             cameraZ = cam.transform.position.z;
 
             if (titleText == null)
@@ -75,7 +70,6 @@ namespace Babel
         private void Update()
         {
             introTimer += Time.deltaTime;
-
             MoveTitleText();
             MoveRoot();
             CameraWork();
@@ -89,23 +83,18 @@ namespace Babel
             if (titleText != null)
             {
                 titleRootPosition = titleText.anchoredPosition;
-
-                titleText.anchoredPosition =
-                    titleRootPosition + new Vector2(0, screenHeight + titleText.rect.height);
+                titleText.anchoredPosition = titleRootPosition + new Vector2(0, screenHeight + titleText.rect.height);
             }
 
             if (root != null)
             {
                 rootRootPosition = root.anchoredPosition;
-
-                root.anchoredPosition =
-                    rootRootPosition + new Vector2(screenWidth + root.rect.width, 0);
+                root.anchoredPosition = rootRootPosition + new Vector2(screenWidth + root.rect.width, 0);
             }
 
             if (cam != null)
             {
                 Vector3 targetPos = GetCameraBasePosition();
-
                 cam.transform.position = targetPos + cameraStartOffset;
             }
         }
@@ -117,11 +106,7 @@ namespace Babel
 
             if (Vector2.Distance(titleText.anchoredPosition, titleRootPosition) >= 0.1f)
             {
-                titleText.anchoredPosition = Vector2.Lerp(
-                    titleText.anchoredPosition,
-                    titleRootPosition,
-                    Time.deltaTime * titleMoveSpeed
-                );
+                titleText.anchoredPosition = Vector2.Lerp(titleText.anchoredPosition, titleRootPosition, Time.deltaTime * titleMoveSpeed);
             }
         }
 
@@ -132,11 +117,7 @@ namespace Babel
 
             if (Vector2.Distance(root.anchoredPosition, rootRootPosition) >= 0.1f)
             {
-                root.anchoredPosition = Vector2.Lerp(
-                    root.anchoredPosition,
-                    rootRootPosition,
-                    Time.deltaTime * rootMoveSpeed
-                );
+                root.anchoredPosition = Vector2.Lerp(root.anchoredPosition, rootRootPosition, Time.deltaTime * rootMoveSpeed);
             }
         }
 
@@ -158,35 +139,18 @@ namespace Babel
             {
                 floatingTimer += Time.deltaTime;
                 float floatingY = Mathf.Sin(floatingTimer * floatingSpeed) * floatingAmount;
-
                 targetPos.y += floatingY;
             }
 
             float speed = cameraIntroFinished ? floatingFollowSpeed : cameraMoveSpeed;
-
-            Vector3 lerpPos = Vector3.Lerp(
-                cam.transform.position,
-                targetPos,
-                Time.deltaTime * speed
-            );
-
+            Vector3 lerpPos = Vector3.Lerp(cam.transform.position, targetPos, Time.deltaTime * speed);
             lerpPos.z = cameraZ;
             cam.transform.position = lerpPos;
         }
 
         private Vector3 GetCameraBasePosition()
         {
-            Vector3 targetPos;
-
-            if (cameraTargetPivot != null)
-            {
-                targetPos = cameraTargetPivot.position + cameraTargetOffset;
-            }
-            else
-            {
-                targetPos = cam.transform.position;
-            }
-
+            Vector3 targetPos = cameraTargetPivot != null ? cameraTargetPivot.position + cameraTargetOffset : cam.transform.position;
             targetPos.z = cameraZ;
             return targetPos;
         }
@@ -196,9 +160,8 @@ namespace Babel
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
 #else
-    Application.Quit();
+            Application.Quit();
 #endif
         }
-
     }
 }

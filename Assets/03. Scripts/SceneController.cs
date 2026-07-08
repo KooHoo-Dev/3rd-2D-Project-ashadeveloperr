@@ -1,16 +1,10 @@
-using Study.Utilities;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 namespace Babel
 {
-
     public class SceneController : MonoBehaviour
     {
-
         public enum GameScene
         {
             Boot = 0,
@@ -30,10 +24,9 @@ namespace Babel
         public void NextStage()
         {
             Time.timeScale = 1.0f;
-
             Scene currentScene = SceneManager.GetActiveScene();
 
-            if (GameManager.Instance.isGameOver)
+            if (GameManager.Instance.IsGameOver)
             {
                 SceneManager.LoadScene(currentScene.buildIndex);
             }
@@ -46,10 +39,8 @@ namespace Babel
         public void ChangeScene(GameScene targetScene)
         {
             Time.timeScale = 1.0f;
-
             PrevScene = CurrentScene;
             CurrentScene = targetScene;
-
             SceneManager.LoadScene((int)CurrentScene);
         }
 
@@ -57,11 +48,5 @@ namespace Babel
         {
             ChangeScene(PrevScene);
         }
-
-
-
-
     }
-
-
 }

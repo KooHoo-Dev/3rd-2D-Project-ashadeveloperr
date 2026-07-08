@@ -5,12 +5,12 @@ namespace Babel
 {
     public class ExplosionEffect : MonoBehaviour
     {
-        [Header("Scale Settings")]
+        [Header("크기 연출")]
         [SerializeField] private float startScale = 0.2f;
         [SerializeField] private float maxScale = 4.0f;
         [SerializeField] private float duration = 0.18f;
 
-        [Header("Fade Settings")]
+        [Header("페이드 연출")]
         [SerializeField] private float startAlpha = 1.0f;
         [SerializeField] private float endAlpha = 0.0f;
 
@@ -48,9 +48,7 @@ namespace Babel
             while (timer < duration)
             {
                 timer += Time.deltaTime;
-
                 float t = Mathf.Clamp01(timer / duration);
-
                 float scale = Mathf.Lerp(startScale, maxScale, t);
                 transform.localScale = Vector3.one * scale;
 

@@ -4,41 +4,36 @@ namespace Babel
 {
     public class Block : MonoBehaviour
     {
-        public int level = 1;
-        public bool HasFirstContact { get; private set; } = false;
-        public bool HasLost { get; private set; } = false;
+        [Header("블록 기본 설정")]
+        [SerializeField] protected int blockValue = 100;
 
-        protected float baseMass;
+        [Header("회전 설정")]
+        [SerializeField] private float minRotationSpeed = 5f;
+        [SerializeField] private float maxRotationSpeed = 30f;
 
-        [Header("Rotation Settings")]
-        public float minRotationSpeed = 5f;
-        public float maxRotationSpeed = 30f;
-        protected float assignedAngularVelocity;
-        protected bool isFired = false;
-
-        [Header("Wind Settings")]
+        [Header("바람 설정")]
         [SerializeField] protected float windPower = 0.35f;
-        public float WindPower => windPower;
-
-        protected float assignedWindSpeed;
-
-        protected bool isUnderWater;
-        public int blockValue = 100;
 
         protected Rigidbody2D rb;
         protected Collider2D col;
+        protected float baseMass;
+        protected float assignedAngularVelocity;
+        protected float assignedWindSpeed;
+        protected bool isFired = false;
+        protected bool isUnderWater;
+
+        public bool HasFirstContact { get; private set; } = false;
+        public bool HasLost { get; private set; } = false;
+        public float WindPower => windPower;
 
         protected virtual void Awake()
         {
             rb = GetComponent<Rigidbody2D>();
             col = GetComponent<Collider2D>();
-
             col.enabled = false;
             rb.gravityScale = 0.0f;
             rb.bodyType = RigidbodyType2D.Kinematic;
-
             baseMass = rb.mass;
-
             float randomSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
             float randomDirection = Random.Range(-1, 1) >= 0 ? 1f : -1f;
             assignedAngularVelocity = randomSpeed * randomDirection;
@@ -79,13 +74,10 @@ namespace Babel
         {
             isFired = true;
             assignedWindSpeed = windSpeed;
-
             col.enabled = true;
             rb.bodyType = RigidbodyType2D.Dynamic;
             rb.gravityScale = 1.0f;
-
             transform.SetParent(null);
-
             rb.AddForce(force, ForceMode2D.Impulse);
             rb.angularVelocity = assignedAngularVelocity;
         }
@@ -120,7 +112,7 @@ namespace Babel
 
         protected virtual void OnCollisionEnter2D(Collision2D collision)
         {
-            if (GameManager.Instance.isGameOver) return;
+            if (GameManager.Instance.IsGameOver) return;
             if (HasLost) return;
 
             if (HasFirstContact == false)
@@ -132,7 +124,7 @@ namespace Babel
 
         protected virtual void OnTriggerEnter2D(Collider2D collision)
         {
-            if (GameManager.Instance.isGameOver) return;
+            if (GameManager.Instance.IsGameOver) return;
 
             if (collision.CompareTag("Underwater") && HasLost == false)
             {

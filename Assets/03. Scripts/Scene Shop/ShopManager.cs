@@ -5,37 +5,44 @@ using UnityEngine.UI;
 
 namespace Babel
 {
-
     public class ShopManager : MonoBehaviour
     {
-        public TMP_Text userGoldText;
-        public TMP_Text shipNameText;
-        public TMP_Text shipPriceText;
-        public TMP_Text pumpPriceText;
-        public TMP_Text timerPriceText;
-        public TMP_Text insurancePriceText;
-        public TMP_Text pumpLevelText;
-        public TMP_Text timerLevelText;
-        public TMP_Text insuranceLevelText;
-        public TMP_Text shipSpecText;
-        public TMP_Text shipMaintenanceText;
-        public TMP_Text totalMaintenanceText;
+        [Header("골드 UI")]
+        [SerializeField] private TMP_Text userGoldText;
 
-        public Button shipButton;
+        [Header("선박 UI")]
+        [SerializeField] private TMP_Text shipNameText;
+        [SerializeField] private TMP_Text shipPriceText;
+        [SerializeField] private TMP_Text shipSpecText;
+        [SerializeField] private TMP_Text shipMaintenanceText;
+        [SerializeField] private Button shipButton;
 
-        public Image notEnoughGold;
+        [Header("업그레이드 UI")]
+        [SerializeField] private TMP_Text pumpPriceText;
+        [SerializeField] private TMP_Text timerPriceText;
+        [SerializeField] private TMP_Text insurancePriceText;
+        [SerializeField] private TMP_Text pumpLevelText;
+        [SerializeField] private TMP_Text timerLevelText;
+        [SerializeField] private TMP_Text insuranceLevelText;
 
-        public Image canoeImage;
-        public Image boatImage;
-        public Image cargoImage;
+        [Header("유지비 UI")]
+        [SerializeField] private TMP_Text totalMaintenanceText;
+
+        [Header("상점 이미지")]
+        [SerializeField] private Image canoeImage;
+        [SerializeField] private Image boatImage;
+        [SerializeField] private Image cargoImage;
+
+        [Header("알림 UI")]
+        [SerializeField] private Image notEnoughGold;
 
         private int shipPrice;
         private int pumpPrice;
         private int timerPrice;
         private int insurancePrice;
-
         private Coroutine countCoroutine;
         private int currentDisplayedLoot = 0;
+        private event System.Action<int> OnLootChanged;
 
         private void Start()
         {
@@ -45,7 +52,7 @@ namespace Babel
         private void OnEnable()
         {
             UpdateLootValue(TotalGameManager.Instance.PlayerGold);
-            refreshUIandPrice();
+            RefreshUIAndPrice();
         }
 
         private void OnDestroy()
@@ -53,25 +60,18 @@ namespace Babel
             OnLootChanged -= UpdateLootValue;
         }
 
-
-
-
-        private void refreshUIandPrice()
+        private void RefreshUIAndPrice()
         {
             RefreshShipUI();
-
             pumpPrice = 300 + (TotalGameManager.Instance.CurrentLevelPump * 300);
-            pumpPriceText.SetText($"{300 + (TotalGameManager.Instance.CurrentLevelPump * 300)}");
+            pumpPriceText.SetText($"{pumpPrice}");
             pumpLevelText.SetText($"Lv.{TotalGameManager.Instance.CurrentLevelPump}");
-
             timerPrice = 500 + (TotalGameManager.Instance.CurrentLevelTimer * 500);
-            timerPriceText.SetText($"{500 + (TotalGameManager.Instance.CurrentLevelTimer * 500)}");
+            timerPriceText.SetText($"{timerPrice}");
             timerLevelText.SetText($"Lv.{TotalGameManager.Instance.CurrentLevelTimer}");
-
             insurancePrice = 200 + (TotalGameManager.Instance.CurrentLevelInsurance * 200);
-            insurancePriceText.SetText($"{200 + (TotalGameManager.Instance.CurrentLevelInsurance * 200)}");
+            insurancePriceText.SetText($"{insurancePrice}");
             insuranceLevelText.SetText($"Lv.{TotalGameManager.Instance.CurrentLevelInsurance}");
-
             RefreshTotalMaintenanceUI();
         }
 
@@ -86,18 +86,17 @@ namespace Babel
             totalMaintenanceText.SetText($"{totalMaintenanceCost}");
         }
 
-
         public void ShipUpgrade()
         {
             TotalGameManager manager = TotalGameManager.Instance;
 
-            if (!TryGetNextShipType(manager.currentShipType, out TotalGameManager.ShipType nextShipType))
+            if (!TryGetNextShipType(manager.CurrentShipType, out TotalGameManager.ShipType nextShipType))
             {
-                refreshUIandPrice();
+                RefreshUIAndPrice();
                 return;
             }
 
-            shipPrice = GetShipUpgradePrice(manager.currentShipType);
+            shipPrice = GetShipUpgradePrice(manager.CurrentShipType);
 
             if (manager.PlayerGold < shipPrice)
             {
@@ -106,22 +105,19 @@ namespace Babel
             }
 
             manager.AddGold(-shipPrice);
-            manager.currentShipType = nextShipType;
-
+            manager.CurrentShipType = nextShipType;
             OnLootChanged?.Invoke(manager.PlayerGold);
-            refreshUIandPrice();
+            RefreshUIAndPrice();
         }
-
 
         private void RefreshShipUI()
         {
             TotalGameManager manager = TotalGameManager.Instance;
-            TotalGameManager.ShipType currentShipType = manager.currentShipType;
+            TotalGameManager.ShipType currentShipType = manager.CurrentShipType;
 
             if (!TryGetNextShipType(currentShipType, out TotalGameManager.ShipType nextShipType))
             {
                 shipPrice = 0;
-
                 SetShopShipImage(null);
 
                 if (shipNameText != null)
@@ -141,10 +137,7 @@ namespace Babel
 
                 if (shipSpecText != null)
                 {
-                    shipSpecText.SetText(
-                        $"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\n" +
-                        $"No more ships available."
-                    );
+                    shipSpecText.SetText($"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\nNo more ships available.");
                 }
 
                 if (shipButton != null)
@@ -156,10 +149,8 @@ namespace Babel
             }
 
             shipPrice = GetShipUpgradePrice(currentShipType);
-
             int currentShipMaintenanceCost = manager.GetShipMaintenanceCost(currentShipType);
             int nextShipMaintenanceCost = manager.GetShipMaintenanceCost(nextShipType);
-
             SetShopShipImage(nextShipType);
 
             if (shipNameText != null)
@@ -174,18 +165,12 @@ namespace Babel
 
             if (shipMaintenanceText != null)
             {
-                shipMaintenanceText.SetText(
-                    $"Current Maintenance : {currentShipMaintenanceCost}\n" +
-                    $"Next Maintenance : {nextShipMaintenanceCost}"
-                );
+                shipMaintenanceText.SetText($"Current Maintenance : {currentShipMaintenanceCost}\nNext Maintenance : {nextShipMaintenanceCost}");
             }
 
             if (shipSpecText != null)
             {
-                shipSpecText.SetText(
-                    $"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\n" +
-                    $"This {GetShipDisplayName(nextShipType)}'s displacement : {GetShipMass(nextShipType)}kg"
-                );
+                shipSpecText.SetText($"Your {GetShipDisplayName(currentShipType)}'s displacement : {GetShipMass(currentShipType)}kg\nThis {GetShipDisplayName(nextShipType)}'s displacement : {GetShipMass(nextShipType)}kg");
             }
 
             if (shipButton != null)
@@ -211,7 +196,6 @@ namespace Babel
                 cargoImage.gameObject.SetActive(nextShipType == TotalGameManager.ShipType.Cargo);
             }
         }
-
 
         private int GetShipUpgradePrice(TotalGameManager.ShipType currentShipType)
         {
@@ -255,67 +239,62 @@ namespace Babel
                 case TotalGameManager.ShipType.Raft:
                     nextShipType = TotalGameManager.ShipType.Canoe;
                     return true;
-
                 case TotalGameManager.ShipType.Canoe:
                     nextShipType = TotalGameManager.ShipType.Boat;
                     return true;
-
                 case TotalGameManager.ShipType.Boat:
                     nextShipType = TotalGameManager.ShipType.Cargo;
                     return true;
-
                 default:
                     nextShipType = currentShipType;
                     return false;
             }
         }
 
-
         public void PumpUpgrade()
         {
-            if(TotalGameManager.Instance.PlayerGold >= pumpPrice)
+            if (TotalGameManager.Instance.PlayerGold >= pumpPrice)
             {
                 TotalGameManager.Instance.CurrentLevelPump++;
                 TotalGameManager.Instance.AddGold(-pumpPrice);
                 OnLootChanged?.Invoke(TotalGameManager.Instance.PlayerGold);
-                refreshUIandPrice();
+                RefreshUIAndPrice();
             }
             else
             {
                 Debug.Log("골드가 부족합니다.");
             }
         }
+
         public void TimerUpgrade()
         {
             if (TotalGameManager.Instance.PlayerGold >= timerPrice)
             {
                 TotalGameManager.Instance.CurrentLevelTimer++;
                 TotalGameManager.Instance.AddGold(-timerPrice);
-
                 OnLootChanged?.Invoke(TotalGameManager.Instance.PlayerGold);
-                refreshUIandPrice();
+                RefreshUIAndPrice();
             }
             else
             {
                 Debug.Log("골드가 부족합니다.");
             }
         }
+
         public void InsuranceUpgrade()
         {
             if (TotalGameManager.Instance.PlayerGold >= insurancePrice)
             {
                 TotalGameManager.Instance.CurrentLevelInsurance++;
                 TotalGameManager.Instance.AddGold(-insurancePrice);
-
                 OnLootChanged?.Invoke(TotalGameManager.Instance.PlayerGold);
-                refreshUIandPrice();
+                RefreshUIAndPrice();
             }
             else
             {
                 Debug.Log("골드가 부족합니다.");
             }
         }
-
 
         private void UpdateLootValue(int targetLoot)
         {
@@ -333,7 +312,6 @@ namespace Babel
             {
                 elapsed += Time.deltaTime;
                 currentDisplayedLoot = (int)Mathf.Lerp(startLoot, targetLoot, elapsed / duration);
-
                 userGoldText.SetText($"{currentDisplayedLoot}");
                 yield return null;
             }
@@ -342,9 +320,5 @@ namespace Babel
             userGoldText.SetText($"{currentDisplayedLoot}");
             countCoroutine = null;
         }
-
-
-
-        public event System.Action<int> OnLootChanged;
     }
 }

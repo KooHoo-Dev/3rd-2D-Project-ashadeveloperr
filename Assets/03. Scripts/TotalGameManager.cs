@@ -1,36 +1,28 @@
-using Study.Utilities;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.Serialization;
 
 namespace Babel
 {
-
     public class TotalGameManager : SingletonBase<TotalGameManager>
     {
+        [Header("씬 설정")]
         [SerializeField] private string bankruptcySceneName = "BankruptcyEnding";
 
+        [FormerlySerializedAs("currentShipType")]
+        [SerializeField] private ShipType currentShipType = ShipType.Raft;
+        [FormerlySerializedAs("currentStageLevel")]
+        [SerializeField] private int currentStageLevel = 0;
+
         public bool HasSeenStageTutorialSplash { get; private set; } = false;
-
         public int PlayerGold { get; private set; } = 10000;
-
-        public ShipType currentShipType = ShipType.Raft;
+        public ShipType CurrentShipType { get => currentShipType; set => currentShipType = value; }
+        public int CurrentStageLevel { get => currentStageLevel; set => currentStageLevel = value; }
         public int CurrentLevelPump { get; set; } = 0;
         public int CurrentLevelTimer { get; set; } = 0;
         public int CurrentLevelInsurance { get; set; } = 0;
-
         public int MaintenanceCost { get; private set; }
-
-        public int currentStageLevel = 0;
         public bool IsBankrupt { get; private set; }
-
-        public void MarkStageTutorialSplashSeen()
-        {
-            HasSeenStageTutorialSplash = true;
-        }
 
         public enum ShipType
         {
@@ -46,9 +38,14 @@ namespace Babel
             DontDestroyOnLoad(gameObject);
         }
 
+        public void MarkStageTutorialSplashSeen()
+        {
+            HasSeenStageTutorialSplash = true;
+        }
+
         public int TotalMaintenanceCost()
         {
-            MaintenanceCost = (CurrentLevelTimer * 50) + (CurrentLevelPump * 30) + (CurrentLevelInsurance * 20) + GetShipMaintenanceCost(currentShipType);
+            MaintenanceCost = (CurrentLevelTimer * 50) + (CurrentLevelPump * 30) + (CurrentLevelInsurance * 20) + GetShipMaintenanceCost(CurrentShipType);
             return MaintenanceCost;
         }
 
@@ -79,17 +76,12 @@ namespace Babel
         public void ResetAllForNewGame()
         {
             PlayerGold = 0;
-
-            currentShipType = ShipType.Raft;
-
-            currentStageLevel = 0;
-
+            CurrentShipType = ShipType.Raft;
+            CurrentStageLevel = 0;
             CurrentLevelPump = 0;
             CurrentLevelTimer = 0;
             CurrentLevelInsurance = 0;
-
             MaintenanceCost = 0;
-
             IsBankrupt = false;
         }
 
@@ -107,25 +99,19 @@ namespace Babel
 
         public void ResetProgressAfterShipwreck()
         {
-            currentShipType = ShipType.Raft;
-
-            currentStageLevel = 0;
-
+            CurrentShipType = ShipType.Raft;
+            CurrentStageLevel = 0;
             CurrentLevelPump = 0;
             CurrentLevelTimer = 0;
             CurrentLevelInsurance = 0;
-
             MaintenanceCost = 0;
         }
 
         public void UpgradeShip()
         {
-            int current = (int)currentShipType;
+            int current = (int)CurrentShipType;
             current = Mathf.Min(current + 1, (int)ShipType.Cargo);
-            currentShipType = (ShipType)current;
+            CurrentShipType = (ShipType)current;
         }
-
     }
-
-
 }

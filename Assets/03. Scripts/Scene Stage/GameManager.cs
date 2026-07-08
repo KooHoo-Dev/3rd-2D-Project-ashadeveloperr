@@ -2,91 +2,95 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 using static Babel.TotalGameManager;
-using static UnityEngine.GraphicsBuffer;
 
 namespace Babel
 {
     public class GameManager : SingletonBase<GameManager>
     {
-        protected override void OnInitialize()
-        {
-            base.OnInitialize();
-        }
-
-        #region Refs and Var;
-
+        [Header("인게임 UI")]
         [SerializeField] private Image gaugeFillImage;
-        [SerializeField] private UIManager UIManager;
+        [FormerlySerializedAs("UIManager")]
+        [SerializeField] private UIManager uiManager;
         [SerializeField] private TMP_Text lootValueText;
+        [SerializeField] private TMP_Text timerText;
+        [SerializeField] private TMP_Text stageText;
+
+        [Header("결과창 UI")]
         [SerializeField] private TMP_Text insuranceTitleText;
         [SerializeField] private TMP_Text insuranceValueText;
         [SerializeField] private TMP_Text resultLootValueText;
         [SerializeField] private TMP_Text resultCostText;
         [SerializeField] private TMP_Text resultClosingText;
 
-        [SerializeField] private Block[] BlockPrefabs;
-        [SerializeField] private int maxIndexInQueue;
-
+        [Header("게임오버 연출")]
         [SerializeField] private GameObject ggScreen;
+        [SerializeField] private GameObject[] enableObjects;
+        [SerializeField] private GameObject[] disableObjects;
 
-        public float sinkPoint;
-        public bool isGameOver;
-        public bool isFailed;
+        [Header("블록 설정")]
+        [FormerlySerializedAs("BlockPrefabs")]
+        [SerializeField] private Block[] blockPrefabs;
 
-        private Queue<int> blockIndexQueue = new Queue<int>();
-
-        private Coroutine countCoroutine;
-        private int currentDisplayedLoot = 0;
-        private bool hasGameOverProcessed;
-
-        [Header("게임 오버 타이머")]
-
-        [SerializeField] private TMP_Text timerText;
-        [SerializeField] private TMP_Text stageText;
-
-        public float RemainingTime { get; private set; }
-
-        #endregion
-
-        #region User Var;
-        private float pumpPower;
-
-        public int InStageLootValue { get; private set; }
-
-        [Header("배 세팅")]
+        [Header("선박 설정")]
         [SerializeField] private ShipPrefabEntry[] shipPrefabEntries;
         [SerializeField] private Transform shipSpawnPoint;
+
+        [Header("바람 설정")]
+        [SerializeField] private BackgroundManager backgroundManager;
+        [SerializeField] private float maxWindSpeedPerStage = 1.5f;
+        [SerializeField] private float windChangeRatio = 0.1f;
+
+        private readonly Queue<int> blockIndexQueue = new Queue<int>();
+        private Ship ship;
         private Transform shipParent;
+        private Coroutine countCoroutine;
+        private int maxIndexInQueue;
+        private int currentDisplayedLoot = 0;
+        private float sinkPoint;
+        private float pumpPower;
+        private bool isGameOver;
+        private bool isFailed;
+        private bool hasGameOverProcessed;
+        private event System.Action<int> OnLootChanged;
+
+        public Ship CurrentShip => ship;
+        public float SinkPoint => sinkPoint;
+        public bool IsGameOver => isGameOver;
+        public bool IsFailed => isFailed;
+        public float RemainingTime { get; private set; }
+        public int InStageLootValue { get; private set; }
+        public float CurrentWindSpeed { get; private set; }
+        public float CurrentMaxWindSpeed { get; private set; }
 
         [System.Serializable]
         public class ShipPrefabEntry
         {
-            public ShipType shipType;
-            public Ship prefab;
+            [FormerlySerializedAs("shipType")]
+            [SerializeField] private ShipType shipType;
+            [FormerlySerializedAs("prefab")]
+            [SerializeField] private Ship prefab;
+
+            public ShipType ShipType => shipType;
+            public Ship Prefab => prefab;
         }
 
-        public Ship ship;
-
-        [Header("바람 세팅")]
-        [SerializeField] private BackgroundManager backgroundManager;
-
-        [SerializeField] private float maxWindSpeedPerStage = 1.5f;
-        [SerializeField] private float windChangeRatio = 0.1f;
-
-        public float CurrentWindSpeed { get; private set; }
-        public float CurrentMaxWindSpeed { get; private set; }
-
-
-        #endregion
-
-        #region Unity Methods;
+        protected override void OnInitialize()
+        {
+            base.OnInitialize();
+        }
 
         protected override void Awake()
         {
+            base.Awake();
+
+            if (instance != this)
+            {
+                return;
+            }
+
             SpawnShipByCurrentType();
             InitializeBlockQueue();
         }
@@ -95,7 +99,6 @@ namespace Babel
         {
             OnLootChanged += UpdateLootValue;
             UpdateLootValue(InStageLootValue);
-
             pumpPower = 1.5f + (TotalGameManager.Instance.CurrentLevelPump * 1.0f);
             RemainingTime = 20 + (TotalGameManager.Instance.CurrentLevelTimer * 3);
 
@@ -104,14 +107,13 @@ namespace Babel
                 backgroundManager = FindAnyObjectByType<BackgroundManager>();
             }
 
-            if (UIManager == null)
+            if (uiManager == null)
             {
-                UIManager = FindAnyObjectByType<UIManager>();
+                uiManager = FindAnyObjectByType<UIManager>();
             }
 
             UpdateTimerDisplay();
             UpdateStageDisplay();
-
             InitializeWind();
         }
 
@@ -155,41 +157,31 @@ namespace Babel
             }
         }
 
-        #endregion
-
-
-
-        #region Custom Methods;
-
         private bool IsTutorialSplashBlockingGame()
         {
-            return UIManager != null && UIManager.IsTutorialSplashActive;
+            return uiManager != null && uiManager.IsTutorialSplashActive;
         }
 
         private void InitializeWind()
         {
             CurrentMaxWindSpeed = GetCurrentMaxWindSpeed();
             CurrentWindSpeed = Random.Range(-CurrentMaxWindSpeed, CurrentMaxWindSpeed);
-
             ApplyWindState();
         }
 
         private float GetCurrentMaxWindSpeed()
         {
-            int displayStage = Mathf.Max(TotalGameManager.Instance.currentStageLevel + 1, 1);
+            int displayStage = Mathf.Max(TotalGameManager.Instance.CurrentStageLevel + 1, 1);
             return displayStage * maxWindSpeedPerStage;
         }
 
         public void ChangeWindForNextThrow()
         {
             CurrentMaxWindSpeed = GetCurrentMaxWindSpeed();
-
             float maxDelta = CurrentMaxWindSpeed * windChangeRatio;
             float delta = Random.Range(-maxDelta, maxDelta);
-
             CurrentWindSpeed += delta;
             CurrentWindSpeed = Mathf.Clamp(CurrentWindSpeed, -CurrentMaxWindSpeed, CurrentMaxWindSpeed);
-
             ApplyWindState();
         }
 
@@ -200,9 +192,9 @@ namespace Babel
                 backgroundManager.SetWind(CurrentWindSpeed);
             }
 
-            if (UIManager != null)
+            if (uiManager != null)
             {
-                UIManager.UpdateWindDisplay(CurrentWindSpeed);
+                uiManager.UpdateWindDisplay(CurrentWindSpeed);
             }
         }
 
@@ -213,24 +205,22 @@ namespace Babel
                 return;
             }
 
-            int displayStage = TotalGameManager.Instance.currentStageLevel + 1;
+            int displayStage = TotalGameManager.Instance.CurrentStageLevel + 1;
             stageText.SetText($"Stage {displayStage:00}");
         }
 
         private void SpawnShipByCurrentType()
         {
-            ShipType currentType = TotalGameManager.Instance.currentShipType;
+            ShipType currentType = TotalGameManager.Instance.CurrentShipType;
             Ship prefab = GetShipPrefab(currentType);
-
             Vector3 spawnPosition = shipSpawnPoint != null ? shipSpawnPoint.position : Vector3.zero;
             Quaternion spawnRotation = shipSpawnPoint != null ? shipSpawnPoint.rotation : Quaternion.identity;
-
             ship = Instantiate(prefab, spawnPosition, spawnRotation, shipParent);
+            UIManager foundUIManager = FindAnyObjectByType<UIManager>();
 
-            UIManager uiManager = FindAnyObjectByType<UIManager>();
-            if (uiManager != null)
+            if (foundUIManager != null)
             {
-                uiManager.ship = ship;
+                foundUIManager.SetShip(ship);
             }
         }
 
@@ -238,9 +228,9 @@ namespace Babel
         {
             foreach (ShipPrefabEntry entry in shipPrefabEntries)
             {
-                if (entry.shipType == shipType)
+                if (entry.ShipType == shipType)
                 {
-                    return entry.prefab;
+                    return entry.Prefab;
                 }
             }
 
@@ -249,8 +239,8 @@ namespace Babel
 
         private void InitializeBlockQueue()
         {
-            int stageTargetIndex = Mathf.Max(TotalGameManager.Instance.currentStageLevel, 0);
-            maxIndexInQueue = Mathf.Min(stageTargetIndex, BlockPrefabs.Length);
+            int stageTargetIndex = Mathf.Max(TotalGameManager.Instance.CurrentStageLevel, 0);
+            maxIndexInQueue = Mathf.Min(stageTargetIndex, blockPrefabs.Length);
 
             if (maxIndexInQueue <= 0)
             {
@@ -260,16 +250,13 @@ namespace Babel
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
         }
 
-
         private void UpdateTimerDisplay()
         {
             int totalSeconds = Mathf.CeilToInt(RemainingTime);
             int minutes = totalSeconds / 60;
             int seconds = totalSeconds % 60;
-
             timerText.text = $"{minutes:D2}:{seconds:D2}";
         }
-
 
         private void UpdateLootValue(int targetLoot)
         {
@@ -282,32 +269,38 @@ namespace Babel
             while (currentDisplayedLoot != targetLoot)
             {
                 if (currentDisplayedLoot < targetLoot)
+                {
                     currentDisplayedLoot++;
+                }
                 else
+                {
                     currentDisplayedLoot--;
+                }
 
                 lootValueText.SetText($"{currentDisplayedLoot}");
-
                 yield return new WaitForSeconds(0.003f);
             }
+
             countCoroutine = null;
         }
 
         private void IsDeckSinking()
         {
-            if (ship.deckLeft.position.y <= 0 || ship.deckCenter.position.y <= 0 || ship.deckRight.position.y <= 0)
+            if (ship.DeckLeft.position.y <= 0 || ship.DeckCenter.position.y <= 0 || ship.DeckRight.position.y <= 0)
             {
-                if (ship.deckLeft.position.y <= 0)
+                if (ship.DeckLeft.position.y <= 0)
                 {
-                    SinkingEffect(ship.deckLeft);
+                    SinkingEffect(ship.DeckLeft);
                 }
-                if (ship.deckCenter.position.y <= 0)
+
+                if (ship.DeckCenter.position.y <= 0)
                 {
-                    SinkingEffect(ship.deckCenter);
+                    SinkingEffect(ship.DeckCenter);
                 }
-                if (ship.deckRight.position.y <= 0)
+
+                if (ship.DeckRight.position.y <= 0)
                 {
-                    SinkingEffect(ship.deckRight);
+                    SinkingEffect(ship.DeckRight);
                 }
             }
             else
@@ -326,8 +319,10 @@ namespace Babel
                     {
                         sinkPoint -= pumpPower * Time.deltaTime;
                     }
-                    else sinkPoint = 0;
-
+                    else
+                    {
+                        sinkPoint = 0;
+                    }
                 }
                 else
                 {
@@ -354,20 +349,15 @@ namespace Babel
         {
             int dequeueIndex = blockIndexQueue.Dequeue();
             blockIndexQueue.Enqueue(Random.Range(0, maxIndexInQueue));
-
             Block block = GetBlock(dequeueIndex);
             return block;
         }
 
         private Block GetBlock(int index)
         {
-            if (index < 0 || BlockPrefabs.Length <= index) return BlockPrefabs[0];
-            return BlockPrefabs[index];
+            if (index < 0 || blockPrefabs.Length <= index) return blockPrefabs[0];
+            return blockPrefabs[index];
         }
-
-        [Header("GameOver Settings")]
-        public GameObject[] enableObjects;
-        public GameObject[] disableObjects;
 
         public void GameOver()
         {
@@ -378,7 +368,6 @@ namespace Babel
 
             hasGameOverProcessed = true;
             isGameOver = true;
-
             int maintenanceCost = TotalGameManager.Instance.TotalMaintenanceCost();
 
             if (isFailed)
@@ -389,27 +378,23 @@ namespace Babel
             OnLootChanged?.Invoke(InStageLootValue);
             resultLootValueText.SetText($"+{InStageLootValue}");
             resultCostText.SetText($"-{maintenanceCost}");
-
             int baseClosing = InStageLootValue - maintenanceCost;
 
             if (isFailed == false && baseClosing > 0)
             {
-                TotalGameManager.Instance.currentStageLevel++;
+                TotalGameManager.Instance.CurrentStageLevel++;
             }
 
             insuranceTitleText.gameObject.SetActive(false);
             insuranceValueText.gameObject.SetActive(false);
-
             int totalClosing;
 
             if (baseClosing < 0 && TotalGameManager.Instance.CurrentLevelInsurance > 0)
             {
                 insuranceTitleText.gameObject.SetActive(true);
                 insuranceValueText.gameObject.SetActive(true);
-
                 int divisor = TotalGameManager.Instance.CurrentLevelInsurance + 1;
                 totalClosing = baseClosing / divisor;
-
                 int savedAmount = Mathf.Abs(baseClosing - totalClosing);
                 insuranceValueText.SetText($"+{savedAmount}");
             }
@@ -428,13 +413,12 @@ namespace Babel
 
             resultClosingText.SetText($"{totalClosing}");
 
-
-            if (isFailed) // 똑같은 조건문을 처리 방식 때문에 두번 부르는건 에반데
+            if (isFailed)
             {
                 TotalGameManager.Instance.ResetProgressAfterShipwreck();
             }
 
-            UIManager.ShowResultWindow(totalClosing);
+            uiManager.ShowResultWindow(totalClosing);
 
             for (int i = 0; i < enableObjects.Length; ++i)
             {
@@ -449,22 +433,20 @@ namespace Babel
 
         private void GameOverEffect()
         {
-            Vector3 moveVector = new Vector3(0, 1, 0);
-            SpriteRenderer screenSR = ggScreen.GetComponent<SpriteRenderer>();
-            Color screenColor = screenSR.color;
-            
-            if (ship.rb.gravityScale < 10.0f)
+            SpriteRenderer screenSpriteRenderer = ggScreen.GetComponent<SpriteRenderer>();
+            Color screenColor = screenSpriteRenderer.color;
+
+            if (ship.Rigidbody.gravityScale < 10.0f)
             {
-                ship.rb.gravityScale += 0.7f * Time.deltaTime;
+                ship.Rigidbody.gravityScale += 0.7f * Time.deltaTime;
             }
+
             if (screenColor.a < 0.8f)
             {
                 screenColor.a += 0.15f * Time.deltaTime;
-                screenSR.color = screenColor;
+                screenSpriteRenderer.color = screenColor;
             }
         }
-
-
 
         public void AddLoot(int loot)
         {
@@ -477,10 +459,5 @@ namespace Babel
             InStageLootValue -= loot;
             OnLootChanged?.Invoke(InStageLootValue);
         }
-
-        public event System.Action<int> OnLootChanged;
-
-        #endregion
-
     }
 }

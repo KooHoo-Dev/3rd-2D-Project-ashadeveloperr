@@ -4,7 +4,7 @@ namespace Babel
 {
     public class ChickenBlock : Block
     {
-        [Header("Fried Chicken Settings")]
+        [Header("후라이드 치킨 설정")]
         [SerializeField] private Sprite friedSprite;
         [SerializeField] private PhysicsMaterial2D friedPhysicsMaterial;
         [SerializeField] private Color friedColor = new Color(1.0f, 0.65f, 0.2f, 1.0f);
@@ -15,7 +15,6 @@ namespace Babel
         protected override void Awake()
         {
             base.Awake();
-
             spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         }
 
