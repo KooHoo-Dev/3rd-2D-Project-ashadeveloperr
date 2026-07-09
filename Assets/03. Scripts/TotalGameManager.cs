@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 namespace Babel
 {
@@ -9,20 +8,18 @@ namespace Babel
         [Header("씬 설정")]
         [SerializeField] private string bankruptcySceneName = "BankruptcyEnding";
 
-        [FormerlySerializedAs("currentShipType")]
         [SerializeField] private ShipType currentShipType = ShipType.Raft;
-        [FormerlySerializedAs("currentStageLevel")]
-        [SerializeField] private int currentStageLevel = 0;
+        [SerializeField] private int currentStageLevel;
 
-        public bool HasSeenStageTutorialSplash { get; private set; } = false;
+        public bool HasSeenStageTutorialSplash { get; private set; }
         public int PlayerGold { get; private set; } = 10000;
         public ShipType CurrentShipType { get => currentShipType; set => currentShipType = value; }
         public int CurrentStageLevel { get => currentStageLevel; set => currentStageLevel = value; }
-        public int CurrentLevelPump { get; set; } = 0;
-        public int CurrentLevelTimer { get; set; } = 0;
-        public int CurrentLevelInsurance { get; set; } = 0;
-        public int MaintenanceCost { get; private set; }
-        public bool IsBankrupt { get; private set; }
+        public int CurrentLevelPump { get; set; }
+        public int CurrentLevelTimer { get; set; }
+        public int CurrentLevelInsurance { get; set; }
+        private int MaintenanceCost { get; set; }
+        private bool IsBankrupt { get; set; }
 
         public enum ShipType
         {

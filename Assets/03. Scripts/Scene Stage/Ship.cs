@@ -1,30 +1,23 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Babel
 {
     public class Ship : MonoBehaviour
     {
         [Header("물리 참조")]
-        [FormerlySerializedAs("rb")]
         [SerializeField] private Rigidbody2D rb;
 
         [Header("갑판 피벗")]
-        [FormerlySerializedAs("deckLeft")]
         [SerializeField] private Transform deckLeft;
-        [FormerlySerializedAs("deckRight")]
         [SerializeField] private Transform deckRight;
-        [FormerlySerializedAs("deckCenter")]
         [SerializeField] private Transform deckCenter;
 
         [Header("부력 피벗")]
-        [FormerlySerializedAs("leftBuoyancyPoint")]
         [SerializeField] private Transform leftBuoyancyPoint;
-        [FormerlySerializedAs("rightBuoyancyPoint")]
         [SerializeField] private Transform rightBuoyancyPoint;
 
         [Header("해수면 설정")]
-        [SerializeField] private float waterLevel = 0.0f;
+        [SerializeField] private float waterLevel;
         [SerializeField] private float waterResist = 2.0f;
 
         private float baseBuoyancy;

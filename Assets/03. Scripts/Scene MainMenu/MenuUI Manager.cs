@@ -34,15 +34,17 @@ namespace Babel
         private float introTimer;
         private float floatingTimer;
         private float cameraZ;
-        private bool cameraIntroFinished = false;
+        private bool cameraIntroFinished;
 
         private void Awake()
         {
             Time.timeScale = 1.0f;
             cam = Camera.main;
             canvasRectTransform = GetComponent<RectTransform>();
+            
+            if (cam == null) return;
             cameraZ = cam.transform.position.z;
-
+            
             if (titleText == null)
             {
                 Transform titleTransform = transform.Find("TitleText");

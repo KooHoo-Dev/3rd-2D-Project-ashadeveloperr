@@ -37,9 +37,9 @@ namespace Babel
                 }
             }
 
-            if (friedPhysicsMaterial != null && col != null)
+            if (friedPhysicsMaterial != null && Col != null)
             {
-                col.sharedMaterial = friedPhysicsMaterial;
+                Col.sharedMaterial = friedPhysicsMaterial;
             }
 
             blockValue += bonusScore;

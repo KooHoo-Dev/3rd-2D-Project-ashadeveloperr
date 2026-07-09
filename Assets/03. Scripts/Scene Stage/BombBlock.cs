@@ -67,7 +67,7 @@ namespace Babel
         protected override void OnFirstContact(Collision2D collision)
         {
             base.OnFirstContact(collision);
-            if (isFired == false) return;
+            if (IsFired == false) return;
             if (fuseStarted) return;
             if (hasExploded) return;
 
@@ -77,7 +77,7 @@ namespace Babel
 
         private IEnumerator BombRoutine()
         {
-            if (isFired == false) yield break;
+            if (IsFired == false) yield break;
             if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
@@ -86,14 +86,14 @@ namespace Babel
                 yield return WaitUntilAlmostStopped();
             }
 
-            if (isFired == false) yield break;
+            if (IsFired == false) yield break;
             if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
             float idleTime = Random.Range(minIdleTime, maxIdleTime);
             yield return new WaitForSeconds(idleTime);
 
-            if (isFired == false) yield break;
+            if (IsFired == false) yield break;
             if (GameManager.Instance.IsGameOver) yield break;
             if (HasLost) yield break;
 
@@ -107,11 +107,11 @@ namespace Babel
 
             while (restingTimer < requiredRestingTime)
             {
-                if (isFired == false) yield break;
+                if (IsFired == false) yield break;
                 if (GameManager.Instance.IsGameOver) yield break;
                 if (HasLost) yield break;
 
-                bool isAlmostStopped = rb.linearVelocity.sqrMagnitude <= restingVelocity * restingVelocity && Mathf.Abs(rb.angularVelocity) <= restingAngularVelocity;
+                bool isAlmostStopped = Rb.linearVelocity.sqrMagnitude <= restingVelocity * restingVelocity && Mathf.Abs(Rb.angularVelocity) <= restingAngularVelocity;
 
                 if (isAlmostStopped)
                 {
@@ -137,7 +137,7 @@ namespace Babel
 
             while (timer < warningDuration)
             {
-                if (isFired == false) yield break;
+                if (IsFired == false) yield break;
                 if (GameManager.Instance.IsGameOver) yield break;
                 if (HasLost) yield break;
 

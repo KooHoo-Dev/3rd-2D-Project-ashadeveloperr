@@ -365,11 +365,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b113771602a8a64783e62b6b102ecf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Babel.ChickenBlock
-  level: 1
+  blockValue: 250
   minRotationSpeed: 5
   maxRotationSpeed: 30
   windPower: 0.35
-  blockValue: 250
-  friedSprite: {fileID: 0}
-  friedPhysicsMaterial: {fileID: 0}
+  friedSprite: {fileID: 6407497296085877228, guid: 4bec5a79c26935845b840be16cd72678, type: 3}
+  friedPhysicsMaterial: {fileID: 6200000, guid: e452b3161f0aa2844894108f680d6a6c, type: 2}
   friedColor: {r: 0.9685534, g: 0.9205721, b: 0.7705786, a: 1}

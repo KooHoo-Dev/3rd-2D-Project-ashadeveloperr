@@ -41,7 +41,7 @@ namespace Babel
         private int timerPrice;
         private int insurancePrice;
         private Coroutine countCoroutine;
-        private int currentDisplayedLoot = 0;
+        private int currentDisplayedLoot;
         private event System.Action<int> OnLootChanged;
 
         private void Start()

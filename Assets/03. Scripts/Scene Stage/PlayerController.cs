@@ -21,7 +21,7 @@ namespace Babel
 
         private Block currentBlock;
         private Vector2 dragStartPos;
-        private bool isDragging = false;
+        private bool isDragging;
         private Camera mainCamera;
 
         private void Start()

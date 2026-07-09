@@ -25,11 +25,8 @@ namespace Babel
         [SerializeField] private TMP_Text windText;
 
         [Header("카메라 오프셋")]
-        [FormerlySerializedAs("shipPosOffset")]
         [SerializeField] private Vector3 shipPosOffset = new Vector3(-10, 7, 0);
-        [FormerlySerializedAs("throwerOffset")]
         [SerializeField] private Vector3 throwerOffset = new Vector3(-15, 7, 0);
-        [FormerlySerializedAs("blockOffset")]
         [SerializeField] private Vector3 blockOffset = Vector3.zero;
 
         [Header("튜토리얼 스플래시 UI")]
@@ -52,8 +49,8 @@ namespace Babel
         private Vector3 currentOffset;
         private float currentCamZoom = 20f;
         private float currentCamZoomTarget = 20f;
-        private bool onResult = false;
-        private bool onPause = false;
+        private bool onResult;
+        private bool onPause;
         private bool isTutorialSplashHiding;
         private float tutorialSplashHideTimer;
 
@@ -62,11 +59,6 @@ namespace Babel
         public Vector3 ShipPosOffset => shipPosOffset;
         public Vector3 ThrowerOffset => throwerOffset;
         public Vector3 BlockOffset => blockOffset;
-
-        protected override void OnInitialize()
-        {
-            base.OnInitialize();
-        }
 
         protected override void Awake()
         {

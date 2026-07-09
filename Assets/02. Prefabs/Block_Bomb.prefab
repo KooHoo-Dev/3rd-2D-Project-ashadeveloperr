@@ -106,11 +106,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7527dc062ecfca14d924c3608809feaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Babel.BombBlock
-  level: 1
+  blockValue: 500
   minRotationSpeed: 5
   maxRotationSpeed: 30
   windPower: 0.35
-  blockValue: 500
   minIdleTime: 5
   maxIdleTime: 120
   waitUntilAlmostStopped: 0
@@ -125,7 +124,7 @@ MonoBehaviour:
   shakeFrequency: 45
   shakeGetsStronger: 1
   explosionRadius: 9
-  explosionForce: 120
+  explosionForce: 600
   minimumForceRatio: 0.25
   explosionTorque: 20
   explosionTargetMask:

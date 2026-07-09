@@ -14,26 +14,26 @@ namespace Babel
         [Header("바람 설정")]
         [SerializeField] protected float windPower = 0.35f;
 
-        protected Rigidbody2D rb;
-        protected Collider2D col;
-        protected float baseMass;
-        protected float assignedAngularVelocity;
-        protected float assignedWindSpeed;
-        protected bool isFired = false;
-        protected bool isUnderWater;
+        protected Rigidbody2D Rb;
+        protected Collider2D Col;
+        private float baseMass;
+        private float assignedAngularVelocity;
+        private float assignedWindSpeed;
+        private bool isUnderWaterBlock;
+        protected bool IsFired;
 
-        public bool HasFirstContact { get; private set; } = false;
-        public bool HasLost { get; private set; } = false;
+        public bool HasFirstContact { get; private set; }
+        public bool HasLost { get; private set; }
         public float WindPower => windPower;
 
         protected virtual void Awake()
         {
-            rb = GetComponent<Rigidbody2D>();
-            col = GetComponent<Collider2D>();
-            col.enabled = false;
-            rb.gravityScale = 0.0f;
-            rb.bodyType = RigidbodyType2D.Kinematic;
-            baseMass = rb.mass;
+            Rb = GetComponent<Rigidbody2D>();
+            Col = GetComponent<Collider2D>();
+            Col.enabled = false;
+            Rb.gravityScale = 0.0f;
+            Rb.bodyType = RigidbodyType2D.Kinematic;
+            baseMass = Rb.mass;
             float randomSpeed = Random.Range(minRotationSpeed, maxRotationSpeed);
             float randomDirection = Random.Range(-1, 1) >= 0 ? 1f : -1f;
             assignedAngularVelocity = randomSpeed * randomDirection;
@@ -43,7 +43,7 @@ namespace Babel
         {
             IsUnderWater();
 
-            if (isFired == false)
+            if (IsFired == false)
             {
                 transform.Rotate(Vector3.forward * assignedAngularVelocity * Time.deltaTime);
             }
@@ -59,9 +59,9 @@ namespace Babel
             float randomScale = Random.Range(0.8f, 1.2f);
             transform.localScale *= randomScale;
 
-            if (rb != null)
+            if (Rb != null)
             {
-                rb.mass = baseMass * randomScale;
+                Rb.mass = baseMass * randomScale;
             }
         }
 
@@ -72,41 +72,41 @@ namespace Babel
 
         public virtual void Launch(Vector2 force, float windSpeed)
         {
-            isFired = true;
+            IsFired = true;
             assignedWindSpeed = windSpeed;
-            col.enabled = true;
-            rb.bodyType = RigidbodyType2D.Dynamic;
-            rb.gravityScale = 1.0f;
+            Col.enabled = true;
+            Rb.bodyType = RigidbodyType2D.Dynamic;
+            Rb.gravityScale = 1.0f;
             transform.SetParent(null);
-            rb.AddForce(force, ForceMode2D.Impulse);
-            rb.angularVelocity = assignedAngularVelocity;
+            Rb.AddForce(force, ForceMode2D.Impulse);
+            Rb.angularVelocity = assignedAngularVelocity;
         }
 
         protected virtual void ApplyWind()
         {
-            if (isFired == false) return;
-            if (rb.bodyType != RigidbodyType2D.Dynamic) return;
+            if (IsFired == false) return;
+            if (Rb.bodyType != RigidbodyType2D.Dynamic) return;
             if (HasFirstContact) return;
             if (HasLost) return;
-            if (isUnderWater) return;
+            if (isUnderWaterBlock) return;
 
-            Vector2 windForce = Vector2.right * assignedWindSpeed * windPower * rb.mass;
-            rb.AddForce(windForce, ForceMode2D.Force);
+            Vector2 windForce = Vector2.right * assignedWindSpeed * windPower * Rb.mass;
+            Rb.AddForce(windForce, ForceMode2D.Force);
         }
 
         protected virtual void IsUnderWater()
         {
-            if (transform.position.y <= -0.5f && isUnderWater == false)
+            if (transform.position.y <= -0.5f && isUnderWaterBlock == false)
             {
-                isUnderWater = true;
-                rb.gravityScale /= 5;
-                rb.linearVelocity /= 500;
-                rb.angularVelocity /= 10;
+                isUnderWaterBlock = true;
+                Rb.gravityScale /= 5;
+                Rb.linearVelocity /= 500;
+                Rb.angularVelocity /= 10;
             }
-            else if (transform.position.y > -0.5f && isUnderWater)
+            else if (transform.position.y > -0.5f && isUnderWaterBlock)
             {
-                isUnderWater = false;
-                rb.gravityScale *= 5;
+                isUnderWaterBlock = false;
+                Rb.gravityScale *= 5;
             }
         }
 

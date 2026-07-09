@@ -48,7 +48,7 @@ namespace Babel
         private Transform shipParent;
         private Coroutine countCoroutine;
         private int maxIndexInQueue;
-        private int currentDisplayedLoot = 0;
+        private int currentDisplayedLoot;
         private float sinkPoint;
         private float pumpPower;
         private bool isGameOver;
@@ -60,26 +60,19 @@ namespace Babel
         public float SinkPoint => sinkPoint;
         public bool IsGameOver => isGameOver;
         public bool IsFailed => isFailed;
-        public float RemainingTime { get; private set; }
-        public int InStageLootValue { get; private set; }
+        private float RemainingTime { get; set; }
+        private int InStageLootValue { get; set; }
         public float CurrentWindSpeed { get; private set; }
-        public float CurrentMaxWindSpeed { get; private set; }
+        private float CurrentMaxWindSpeed { get; set; }
 
         [System.Serializable]
         public class ShipPrefabEntry
         {
-            [FormerlySerializedAs("shipType")]
             [SerializeField] private ShipType shipType;
-            [FormerlySerializedAs("prefab")]
             [SerializeField] private Ship prefab;
 
             public ShipType ShipType => shipType;
             public Ship Prefab => prefab;
-        }
-
-        protected override void OnInitialize()
-        {
-            base.OnInitialize();
         }
 
         protected override void Awake()

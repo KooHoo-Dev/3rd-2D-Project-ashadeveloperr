@@ -12,7 +12,7 @@ namespace Babel
 
         [Header("페이드 연출")]
         [SerializeField] private float startAlpha = 1.0f;
-        [SerializeField] private float endAlpha = 0.0f;
+        [SerializeField] private float endAlpha;
 
         private SpriteRenderer spriteRenderer;
         private Color originalColor;
