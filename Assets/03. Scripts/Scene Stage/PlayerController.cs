@@ -58,7 +58,7 @@ namespace Babel
 
         private void Update()
         {
-            if (UIManager.IsInitialized && UIManager.Instance.IsTutorialSplashActive)
+            if (IsGameplayBlocked())
             {
                 if (trajectoryLine.enabled)
                 {
@@ -176,18 +176,46 @@ namespace Babel
 
             while (true)
             {
-                if (dropBlock == null || dropBlock.HasFirstContact || dropBlock.HasLost) break;
+                if (GameManager.Instance.IsGameOver)
+                {
+                    yield break;
+                }
+
+                if (dropBlock == null || dropBlock.HasFirstContact || dropBlock.HasLost)
+                {
+                    break;
+                }
+
                 yield return null;
             }
 
-            UIManager.Instance.SetCameraTarget(UIManager.Instance.CurrentShip.transform, UIManager.Instance.ShipPosOffset, 20f);
-
-            if (GameManager.Instance.IsGameOver == false)
+            while (IsGameplayBlocked())
             {
-                GameManager.Instance.ChangeWindForNextThrow();
+                if (GameManager.Instance.IsGameOver)
+                {
+                    yield break;
+                }
+
+                yield return null;
             }
 
+            if (UIManager.Instance.CurrentShip != null)
+            {
+                UIManager.Instance.SetCameraTarget(UIManager.Instance.CurrentShip.transform, UIManager.Instance.ShipPosOffset, 20f);
+            }
+
+            if (GameManager.Instance.IsGameOver)
+            {
+                yield break;
+            }
+
+            GameManager.Instance.ChangeWindForNextThrow();
             SpawnBlock();
+        }
+
+        private bool IsGameplayBlocked()
+        {
+            return StageFlowController.IsInitialized && StageFlowController.Instance.IsGameplayBlocked;
         }
 
         private void DrawTrajectory(Vector2 startPos, Vector2 velocity)

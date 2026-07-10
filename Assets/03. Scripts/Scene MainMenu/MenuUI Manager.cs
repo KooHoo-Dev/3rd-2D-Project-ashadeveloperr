@@ -11,6 +11,9 @@ namespace Babel
         [Header("카메라 참조")]
         [SerializeField] private Transform cameraTargetPivot;
 
+        [Header("씬 이동")]
+        [SerializeField] private SceneController sceneController;
+
         [Header("UI 이동 설정")]
         [SerializeField] private float titleMoveSpeed = 2.0f;
         [SerializeField] private float rootMoveSpeed = 2.0f;
@@ -41,6 +44,11 @@ namespace Babel
             Time.timeScale = 1.0f;
             cam = Camera.main;
             canvasRectTransform = GetComponent<RectTransform>();
+
+            if (sceneController == null)
+            {
+                sceneController = FindAnyObjectByType<SceneController>();
+            }
             
             if (cam == null) return;
             cameraZ = cam.transform.position.z;
@@ -155,6 +163,36 @@ namespace Babel
             Vector3 targetPos = cameraTargetPivot != null ? cameraTargetPivot.position + cameraTargetOffset : cam.transform.position;
             targetPos.z = cameraZ;
             return targetPos;
+        }
+
+
+        public void StartStoryMode()
+        {
+            TotalGameManager.Instance.StartStoryMode();
+            LoadStageScene();
+        }
+
+        public void StartEndlessMode()
+        {
+            if (TotalGameManager.Instance.StartEndlessMode() == false)
+            {
+                return;
+            }
+
+            LoadStageScene();
+        }
+
+        private void LoadStageScene()
+        {
+            if (sceneController == null)
+            {
+                sceneController = FindAnyObjectByType<SceneController>();
+            }
+
+            if (sceneController != null)
+            {
+                sceneController.ChangeScene(SceneController.GameScene.Stage);
+            }
         }
 
         public void ExitGame()

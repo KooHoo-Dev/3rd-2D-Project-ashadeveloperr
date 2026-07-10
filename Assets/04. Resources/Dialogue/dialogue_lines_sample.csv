@@ -1,0 +1,8 @@
+sceneId,lineIndex,command,speakerId,text,expression,slot,waitSeconds
+story_001_intro,0,Enter,asha,,normal,L1,0
+story_001_intro,1,Speak,asha,"첫 항해를 시작해볼까요?",smile,L1,0
+story_001_intro,2,Enter,captain,,serious,R1,0
+story_001_intro,3,Speak,captain,"배가 가라앉지만 않으면 성공이다.",serious,R1,0
+story_001_intro,4,Exit,captain,,,R1,0
+story_001_before_result_fail,0,Speak,asha,"으악, 이건 재도전해야겠어요!",surprised,L1,0
+story_001_before_result_clear,0,Speak,asha,"좋아요. 이 정도면 항해를 계속할 수 있겠어요!",smile,L1,0
