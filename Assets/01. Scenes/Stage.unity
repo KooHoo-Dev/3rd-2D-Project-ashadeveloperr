@@ -5262,19 +5262,17 @@ MonoBehaviour:
   resultScreen: {fileID: 425758974}
   inGameUI: {fileID: 1023596953}
   pauseUI: {fileID: 887432868}
-  InteractUIRight: {fileID: 124142205}
+  interactUIRight: {fileID: 124142205}
   pauseUIScreen: {fileID: 1963020011}
-  NextStageText: {fileID: 1674136087}
-  ResultTitle: {fileID: 222697550}
-  onPause: 0
-  ship: {fileID: 0}
+  nextStageText: {fileID: 1674136087}
+  resultTitle: {fileID: 222697550}
+  windText: {fileID: 1194478325}
   shipPosOffset: {x: -10, y: 7, z: 0}
   throwerOffset: {x: 24, y: 3.5, z: 0}
   blockOffset: {x: 0, y: 0, z: 0}
   tutorialSplashUI: {fileID: 1824533979}
   tutorialSplashRectTransform: {fileID: 1824533980}
   tutorialSplashHideDuration: 0.6
-  windText: {fileID: 1194478325}
 --- !u!1 &748421849
 GameObject:
   m_ObjectHideFlags: 0
@@ -5307,10 +5305,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 124142206}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 637, y: -337}
-  m_SizeDelta: {x: 481.7, y: 56.4}
+  m_AnchorMin: {x: 1, y: 0.5}
+  m_AnchorMax: {x: 1, y: 0.5}
+  m_AnchoredPosition: {x: -321, y: 193.8}
+  m_SizeDelta: {x: 481.69995, y: 56.399994}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &748421851
 MonoBehaviour:
@@ -6271,20 +6269,20 @@ MonoBehaviour:
   userGoldText: {fileID: 1763602652}
   shipNameText: {fileID: 1891003593}
   shipPriceText: {fileID: 1211796134}
+  shipSpecText: {fileID: 1816509516}
+  shipMaintenanceText: {fileID: 1607708899}
+  shipButton: {fileID: 2085498728}
   pumpPriceText: {fileID: 1251552617}
   timerPriceText: {fileID: 453610635}
   insurancePriceText: {fileID: 381970347}
   pumpLevelText: {fileID: 1364658482}
   timerLevelText: {fileID: 329058892}
   insuranceLevelText: {fileID: 1306033813}
-  shipSpecText: {fileID: 1816509516}
-  shipMaintenanceText: {fileID: 1607708899}
   totalMaintenanceText: {fileID: 2021121431}
-  shipButton: {fileID: 2085498728}
-  notEnoughGold: {fileID: 842451137}
   canoeImage: {fileID: 2056613162}
   boatImage: {fileID: 607602259}
   cargoImage: {fileID: 1539460590}
+  notEnoughGold: {fileID: 842451137}
 --- !u!4 &1045488934
 Transform:
   m_ObjectHideFlags: 0
@@ -6552,26 +6550,31 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Babel.GameManager
   gaugeFillImage: {fileID: 1670354490}
-  UIManager: {fileID: 743020144}
+  uiManager: {fileID: 743020144}
   lootValueText: {fileID: 2093902019}
+  timerText: {fileID: 100451797}
+  stageText: {fileID: 213320285}
   insuranceTitleText: {fileID: 698492704}
   insuranceValueText: {fileID: 1436030780}
   resultLootValueText: {fileID: 2073793082}
   resultCostText: {fileID: 1366127642}
   resultClosingText: {fileID: 71321212}
-  BlockPrefabs:
+  ggScreen: {fileID: 1894597054}
+  enableObjects:
+  - {fileID: 1894597054}
+  - {fileID: 222697548}
+  - {fileID: 1893696491}
+  - {fileID: 1782750160}
+  - {fileID: 669754928}
+  - {fileID: 1207229415}
+  disableObjects:
+  - {fileID: 41369285}
+  blockPrefabs:
   - {fileID: 7660311145588841664, guid: 0e095819adae50649ac74b1fa2a68f8c, type: 3}
   - {fileID: 7660311145588841664, guid: 08a3fb447d5c6cd4b8b80bc6cc4823b5, type: 3}
   - {fileID: 7660311145588841664, guid: 958952251b5504243af5b91ebb392ce8, type: 3}
   - {fileID: -871199318405708274, guid: 394ddf5625997e54fa9d3f086ad02f1a, type: 3}
   - {fileID: 2322143420779979465, guid: ee5ec92bf708a414f81929d196c5ab0f, type: 3}
-  maxIndexInQueue: 0
-  ggScreen: {fileID: 1894597054}
-  sinkPoint: 0
-  isGameOver: 0
-  isFailed: 0
-  timerText: {fileID: 100451797}
-  stageText: {fileID: 213320285}
   shipPrefabEntries:
   - shipType: 0
     prefab: {fileID: 6003093218232200721, guid: fffa17c4787ca2046860bd08c9b9b93b, type: 3}
@@ -6582,19 +6585,9 @@ MonoBehaviour:
   - shipType: 3
     prefab: {fileID: 6003093218232200721, guid: d34d66b9b99df90459a95ba708971a9a, type: 3}
   shipSpawnPoint: {fileID: 1152226034}
-  ship: {fileID: 0}
   backgroundManager: {fileID: 2002894860}
   maxWindSpeedPerStage: 1.5
   windChangeRatio: 0.1
-  enableObjects:
-  - {fileID: 1894597054}
-  - {fileID: 222697548}
-  - {fileID: 1893696491}
-  - {fileID: 1782750160}
-  - {fileID: 669754928}
-  - {fileID: 1207229415}
-  disableObjects:
-  - {fileID: 41369285}
 --- !u!1 &1115331739
 GameObject:
   m_ObjectHideFlags: 0
@@ -11282,8 +11275,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::G
   flowSpeed: 2
   flowDirection: {x: -1, y: 0, z: 0}
-  CloudPivotLeft: {fileID: 1397633797}
-  CloudPivotRight: {fileID: 1782833760}
+  cloudPivotLeft: {fileID: 1397633797}
+  cloudPivotRight: {fileID: 1782833760}
   cloudPrefab: {fileID: 781654996479968413, guid: 5aacbd257fed2874893ecc695457096c, type: 3}
   cloudLayer: {fileID: 618356317}
   totalCloud: 10
